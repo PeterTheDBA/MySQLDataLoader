@@ -23,9 +23,18 @@ class Table:
 		self.table_references = []
 		for i in self.columns:
 			if i.referenced_table != None:
-				table_reference = {'REFERENCED_SCHEMA': i.referenced_schema, 'REFERENCED_TABLE': i.referenced_table}
+				table_reference = {'REFERENCED_SCHEMA': i.referenced_schema, 'REFERENCED_TABLE': i.referenced_table, 'LIMITING_REFERNCE': False}
+				if i.is_unique and i.is_nullable == False:
+					table_reference['LIMITING_REFERNCE'] = True
 				if table_reference not in self.table_references:
 					self.table_references.append(table_reference)
+	
+	def get_rows_exists_in_table(self):
+		query = "SELECT COUNT(1) FROM %s" % self.table_name
+		cursor = self.cnx.cursor()
+		cursor.execute(query)
+		self.rows_exists_in_table = cursor.fetchone()[0]
+		cursor.close()
 	
 	def __init__(self, cnx, table_name, table_definition):
 		self.cnx = cnx
@@ -37,7 +46,8 @@ class Table:
 		self.rows_per_insert = None
 		self.generate_columns()
 		self.set_table_references()
-		
+		self.get_rows_exists_in_table()
+
 		
 	def generate_insert_values(self):
 		values_statement = "("

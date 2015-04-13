@@ -3,6 +3,12 @@ import getpass
 import MySQLdb
 from Schema import Schema
 
+def set_mysql_session_variables(cnx):
+	cursor = cnx.cursor()
+	query = "SET time_zone = '+00:00';"
+	cursor.execute(query)
+	cursor.close()
+	
 def get_schema_list(cnx):
     schema_list = []
     query = ("SELECT schema_name FROM information_schema.SCHEMATA"
@@ -33,12 +39,18 @@ def validate_schema_name(schema_name, schema_list):
 		return schema_list[menu_picker(schema_list)-1]
 	else:
 		return schema_name
-		
-def set_mysql_session_variables(cnx):
-	cursor = cnx.cursor()
-	query = "SET time_zone = '+00:00';"
-	cursor.execute(query)
-	cursor.close()	
+
+def validate_table_rows_created(table_index):
+	limiting_referenced_tables = []
+	for i in mysql_schema.tables[table_index].table_references:
+		if i['LIMITING_REFERNCE']:
+			limiting_referenced_tables.append(i)
+	#warning if the row count falls outside the schema focus.
+	#this also means the focus can change as soon as the schema object is instantiated and only has to be done once
+	#TODO: move this to table object
+	#loop through limiting references
+	#if the limited reference is in the current schema, get it's current row count plus the number of rows to be created
+	#make sure the number of rows to be created does not exceed the limited references, if so, adjust the rows to be created so it doesn't exceed the limitation and print info to user
 
 def menu_adjust_creation_properties():
 	table_menu_option = ["Adjust rows to be created", "Done"]
@@ -84,10 +96,15 @@ set_mysql_session_variables(cnx)
 print "Loading information about %s schema.  Please wait." % (mysql_schema_name)
 mysql_schema = Schema(cnx, mysql_schema_name)
 mysql_schema.set_tabkle_defaults(args.rowcount, args.rows_per_insert)
-menu_adjust_creation_properties()
-final_check = raw_input("Are you sure you would like to write random data to the %s schema? [y/n]: " % mysql_schema_name)
-if final_check in ['Y', 'y']:
-	print "Creating Data.  Please wait."
-	mysql_schema.generate_data()
-else:	
-	print "Bye!"
+
+#validate_table_rows_created(2)
+
+
+
+#menu_adjust_creation_properties()
+#final_check = raw_input("Are you sure you would like to write random data to the %s schema? [y/n]: " % mysql_schema_name)
+#if final_check in ['Y', 'y']:
+#	print "Creating Data.  Please wait."
+#	mysql_schema.generate_data()
+#else:	
+#	print "Bye!"

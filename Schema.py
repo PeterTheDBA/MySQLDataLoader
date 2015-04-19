@@ -3,6 +3,12 @@ from Table import Table
 
 class Schema:
 	
+	def mysql_change_schema_focus(self):
+		cursor = self.cnx.cursor()
+		query = "USE %s" % self.schema_name
+		cursor.execute(query)
+		cursor.close()
+
 	def set_schema_definition(self):
 		self.schema_definition = []
 		cursor = self.cnx.cursor(MySQLdb.cursors.DictCursor)
@@ -62,21 +68,16 @@ class Schema:
 	def __init__(self, cnx, schema_name):
 		self.cnx = cnx
 		self.schema_name = schema_name
+		self.mysql_change_schema_focus()
 		self.set_schema_definition()
 		self.set_table_list()
 		self.generate_tables()
 		self.set_tables_load_group_ordinal()
-	
+		
 	def set_tabkle_defaults(self, rows_to_create, rows_per_insert):
 		for table in self.tables:
 			table.rows_to_generate = rows_to_create
 			table.rows_per_insert = rows_per_insert
-
-	def mysql_change_schema_focus(self):
-		cursor = self.cnx.cursor()
-		query = "USE %s" % self.schema_name
-		cursor.execute(query)
-		cursor.close()
 			
 	def generate_data(self):
 		self.mysql_change_schema_focus()
@@ -84,3 +85,10 @@ class Schema:
 			for table in self.tables:
 				if table.table_load_ordinal_group == ordinal_group:
 					table.insert_data()
+					
+	def get_table_index_from_name(self, table_name):
+		table_index = None
+		for i in range(0, len(self.tables)):
+			if self.tables[i].table_name == table_name:
+				table_index = i
+		return table_index;

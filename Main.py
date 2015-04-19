@@ -45,12 +45,21 @@ def validate_table_rows_created(table_index):
 	for i in mysql_schema.tables[table_index].table_references:
 		if i['LIMITING_REFERNCE']:
 			limiting_referenced_tables.append(i)
-	#warning if the row count falls outside the schema focus.
-	#this also means the focus can change as soon as the schema object is instantiated and only has to be done once
-	#TODO: move this to table object
-	#loop through limiting references
-	#if the limited reference is in the current schema, get it's current row count plus the number of rows to be created
-	#make sure the number of rows to be created does not exceed the limited references, if so, adjust the rows to be created so it doesn't exceed the limitation and print info to user
+	if len(limiting_referenced_tables) > 0:
+		lowest_limiting_reference_row_count = None
+		for i in limiting_referenced_tables:
+			limiting_referenced_table_index = mysql_schema.get_table_index_from_name(i['REFERENCED_TABLE'])
+			limiting_reference_row_count = mysql_schema.tables[limiting_referenced_table_index].rows_exists_in_table + mysql_schema.tables[limiting_referenced_table_index].rows_to_generate
+			if limiting_reference_row_count < lowest_limiting_reference_row_count or lowest_limiting_reference_row_count == None:
+				lowest_limiting_reference_row_count = limiting_reference_row_count
+		resulting_rows_validated_table = mysql_schema.tables[table_index].rows_exists_in_table + mysql_schema.tables[table_index].rows_to_generate	
+		if lowest_limiting_reference_row_count < resulting_rows_validated_table:
+			mysql_schema.tables[table_index].rows_to_generate = lowest_limiting_reference_row_count - mysql_schema.tables[table_index].rows_exists_in_table
+			print "Due to limiting references on %s, number of rows in this table cannot exceed %s.  The number of rows to be created has been reduced to %s" % (mysql_schema.tables[table_index].table_name, lowest_limiting_reference_row_count, mysql_schema.tables[table_index].rows_to_generate)
+
+def validate_all_tables_rows_created():
+	for i in range(0, len(mysql_schema.tables)):
+		validate_table_rows_created(i)
 
 def menu_adjust_creation_properties():
 	table_menu_option = ["Adjust rows to be created", "Done"]
@@ -68,6 +77,7 @@ def menu_adjust_creation_properties():
 		if table_menu_selection_index == 0:
 			print "The number of records to be create in table %s is %s" % (mysql_schema.tables[table_index].table_name, mysql_schema.tables[table_index].rows_to_generate)
 			mysql_schema.tables[table_index].rows_to_generate = int(raw_input("How many records should be created in this table? "))
+			validate_table_rows_created(table_index)
 			table_menu_continue = raw_input("Would you like to adjust the properties of any other tables? [y/n]: ")
 		else:
 			table_menu_continue = 0
@@ -96,15 +106,12 @@ set_mysql_session_variables(cnx)
 print "Loading information about %s schema.  Please wait." % (mysql_schema_name)
 mysql_schema = Schema(cnx, mysql_schema_name)
 mysql_schema.set_tabkle_defaults(args.rowcount, args.rows_per_insert)
+menu_adjust_creation_properties()
+validate_all_tables_rows_created()
 
-#validate_table_rows_created(2)
-
-
-
-#menu_adjust_creation_properties()
-#final_check = raw_input("Are you sure you would like to write random data to the %s schema? [y/n]: " % mysql_schema_name)
-#if final_check in ['Y', 'y']:
-#	print "Creating Data.  Please wait."
-#	mysql_schema.generate_data()
-#else:	
-#	print "Bye!"
+final_check = raw_input("Are you sure you would like to write random data to the %s schema? [y/n]: " % mysql_schema_name)
+if final_check in ['Y', 'y']:
+	print "Creating Data.  Please wait."
+	mysql_schema.generate_data()
+else:	
+	print "Bye!"

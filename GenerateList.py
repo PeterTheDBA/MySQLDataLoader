@@ -9,7 +9,8 @@ class GenerateList:
 		elif self.data_type == "set":
 			column_type_start_index = 5
 		self.possible_values = (self.column_type[column_type_start_index:(len(self.column_type)-2)]).split("\',\'")
-
+	
+	#[refexistingdupavoider]: get db connection
 	def __init__(self, data_type, column_type, is_unique):
 		self.data_type = data_type
 		self.column_type = column_type
@@ -54,6 +55,8 @@ class GenerateList:
 			for val in random.sample(self.possible_values,random.randrange(len(self.possible_values))+1):
 				self.value += val + ","
 			self.value = (self.value[:-1])
+			
+	#[refexistingdupavoider]: create function to collect values that already exist in the table so duplicates are not created in the case of unique column
 	
 	def generate_data(self):
 		if self.is_unique == False:
@@ -64,3 +67,4 @@ class GenerateList:
 			else:
 				self.set_next_value()
 		return self.value
+		#[refexistingdupavoider]: revise code to get next value if the column is unique and the record existed in the table prior to load

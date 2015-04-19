@@ -21,12 +21,13 @@ class GenerateReferential:
 		cursor.execute(query)
 		for row in cursor.fetchall():
 			self.possible_values.append(row[0])
+	
+	#create function to remove any values that already exist in the table to avoid the creation of duplicates if the column is unique
 		
 	def generate_data(self):
 		if len(self.possible_values) == 0:
 			self.get_referential_values()
 		if self.is_unique == True:
-			#print "I'm here"
 			self.last_sequential_index += 1
 			return  "'%s'" % (self.possible_values[self.last_sequential_index]) 
 		else:

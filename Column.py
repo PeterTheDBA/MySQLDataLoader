@@ -34,6 +34,7 @@ class Column:
 			self.is_unsigned = False
 	
 	def set_data_generator(self):
+		#revise code to pass db connection to any class that doesn't already take it
 		if self.is_auto_inc == False:
 			if self.referenced_table != None:
 				self.data_generator = GenerateReferential(self.cnx, self.referenced_schema, self.referenced_table, self.referenced_column, self.is_unique)

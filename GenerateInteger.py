@@ -33,8 +33,7 @@ class GenerateInteger:
 			if self.data_type == "bigint":
 				self.min_val = -9223372036854775808
 			self.max_val = abs(self.min_val + 1)
-	
-	#[refexistingdupavoider]: get db connection
+			
 	def __init__(self, data_type, is_unsigned, is_unique):	
 		self.data_type = data_type
 		self.is_unsigned = is_unsigned
@@ -50,8 +49,6 @@ class GenerateInteger:
 		
 	def set_random_value(self):
 		self.value = random.randint(self.min_val,self.max_val)
-		
-	#[refexistingdupavoider]: create function to collect values that already exist in the table so duplicates are not created in the case of unique column
 
 	def generate_data(self):
 		if self.is_unique == False:
@@ -62,4 +59,3 @@ class GenerateInteger:
 			else:
 				self.set_next_value()
 		return self.value
-		#[refexistingdupavoider]: revise code to get next value if the column is unique and the record existed in the table prior to load

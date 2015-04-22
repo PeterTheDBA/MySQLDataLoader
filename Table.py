@@ -17,7 +17,7 @@ class Table:
 		for i in self.table_definition:
 			self.columns.append(Column(self.cnx, i['COLUMN_NAME'], i['IS_NULLABLE'], i['DATA_TYPE'], i['CHARACTER_MAXIMUM_LENGTH'], 
 			i['NUMERIC_PRECISION'], i['NUMERIC_SCALE'], i ['COLUMN_TYPE'], i['IS_AUTOINC'], i['IS_UNIQUE'],
-			i['REFERENCED_SCHEMA'], i['REFERENCED_TABLE'], i['REFERENCED_COLUMN']))
+			i['REFERENCED_SCHEMA'], i['REFERENCED_TABLE'], i['REFERENCED_COLUMN'], self.table_name))
 	
 	def set_table_references(self):
 		self.table_references = []
@@ -35,7 +35,13 @@ class Table:
 		cursor.execute(query)
 		self.rows_exists_in_table = cursor.fetchone()[0]
 		cursor.close()
-	
+
+	def get_unique_column_existing_values(self):
+		if self.rows_exists_in_table > 0:
+			for column in self.columns:
+				if column.is_unique:
+					column.get_existing_values()		
+		
 	def __init__(self, cnx, table_name, table_definition):
 		self.cnx = cnx
 		self.table_name = table_name
@@ -47,8 +53,8 @@ class Table:
 		self.generate_columns()
 		self.set_table_references()
 		self.get_rows_exists_in_table()
+		self.get_unique_column_existing_values()
 
-		
 	def generate_insert_values(self):
 		values_statement = "("
 		for column in self.columns:
@@ -68,3 +74,4 @@ class Table:
 		cursor = self.cnx.cursor()
 		cursor.execute(self.generate_insert_statement(self.rows_to_generate))
 		self.cnx.commit()
+		cursor.close()

@@ -5,8 +5,7 @@ class GenerateDecimal:
 
 	def set_scale_denom(self):
 		self.scale_denominator = 10 ** self.numeric_scale
-	
-	#[refexistingdupavoider]: get db connection	
+
 	def __init__(self, data_type, numeric_precision, numeric_scale, is_unsigned, is_unique):
 		self.data_type = data_type
 		self.numeric_precision = numeric_precision
@@ -35,8 +34,6 @@ class GenerateDecimal:
 		else:
 			self.value =  decimal.Decimal(rand_int) / decimal.Decimal(self.scale_denominator)
 		
-	#[refexistingdupavoider]: create function to collect values that already exist in the table so duplicates are not created in the case of unique column
-	
 	def generate_data(self):
 		if self.is_unique == False:
 			self.set_random_value()
@@ -46,4 +43,3 @@ class GenerateDecimal:
 			else:
 				self.set_next_value()
 		return self.value
-		#[refexistingdupavoider]: revise code to get next value if the column is unique and the record existed in the table prior to load

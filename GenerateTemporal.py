@@ -12,14 +12,12 @@ class GenerateTemporal:
 			self.min_val = datetime.datetime(1970,1,1,0,0,1)
 			self.max_val = datetime.datetime(2038,1,19,3,14,07)
 	
-	#[refexistingdupavoider]: get db connection
 	def __init__(self, data_type, is_unique):
 		self.data_type = data_type
 		self.is_unique = is_unique
 		self.value = None
 		self.get_value_range()
 
-		
 	def set_first_value(self):
 		self.value = self.min_val
 	
@@ -32,8 +30,6 @@ class GenerateTemporal:
 	def set_random_value(self):
 		secondstoadvance = random.randrange((self.max_val - self.min_val).days * 86400 + (self.max_val - self.min_val).seconds)
 		self.value = self.min_val + datetime.timedelta(seconds=secondstoadvance)
-	
-	#[refexistingdupavoider]: create function to collect values that already exist in the table so duplicates are not created in the case of unique column
 	
 	def generate_data(self):
 		if self.is_unique == False:
@@ -49,4 +45,3 @@ class GenerateTemporal:
 			return self.value.time()
 		else:
 			return self.value
-		#[refexistingdupavoider]: revise code to get next value if the column is unique and the record existed in the table prior to load

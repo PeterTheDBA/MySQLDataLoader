@@ -34,7 +34,6 @@ class Column:
 			self.is_unsigned = False
 	
 	def set_data_generator(self):
-		#revise code to pass db connection to any class that doesn't already take it
 		if self.is_auto_inc == False:
 			if self.referenced_table != None:
 				self.data_generator = GenerateReferential(self.cnx, self.referenced_schema, self.referenced_table, self.referenced_column, self.is_unique)
@@ -56,7 +55,8 @@ class Column:
 		else:
 			self.is_data_quoted = False
 		
-	def __init__(self, cnx, column_name, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_scale, column_type, is_auto_inc, is_unique, referenced_schema, referenced_table, referenced_column):
+	def __init__(self, cnx, column_name, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_scale, column_type, is_auto_inc, is_unique, 
+	referenced_schema, referenced_table, referenced_column, table_name):
 		self.column_name = column_name
 		self.is_nullable = is_nullable
 		self.data_type = data_type
@@ -70,16 +70,33 @@ class Column:
 		self.referenced_table = referenced_table
 		self.referenced_column = referenced_column
 		self.cnx = cnx
+		self.table_name = table_name
+		self.existing_values = []
 		self.set_base_data_type()
 		self.set_is_unsigned()
 		self.set_data_generator()
 		self.set_is_data_quoted()
+	
+	def get_existing_values(self):
+		cursor = self.cnx.cursor()
+		query = ("SELECT UPPER(CAST(%s as CHAR)) "
+		"FROM %s "
+		"WHERE %s IS NOT NULL"
+		% (self.column_name, self.table_name, self.column_name))
+		cursor.execute(query)
+		query_result = cursor.fetchall()
+		for row in query_result:
+			self.existing_values.append(row[0])
+		cursor.close()
 		
 	def generate_data(self):
 		if self.is_auto_inc == True:
 			return "NULL"
-		elif self.is_data_quoted == False:
-			return self.data_generator.generate_data()
-		elif self.is_data_quoted == True:
-			return "'%s'" % (self.data_generator.generate_data()) 
-		
+		else:
+			data_val = self.data_generator.generate_data()
+			while str(data_val) in self.existing_values:
+				data_val = self.data_generator.generate_data()
+			if self.is_data_quoted == False:
+				return data_val
+			elif self.is_data_quoted == True:
+				return "'%s'" % (data_val)

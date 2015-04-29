@@ -107,12 +107,17 @@ set_mysql_session_variables(cnx)
 print "Loading information about %s schema.  Please wait." % (mysql_schema_name)
 mysql_schema = Schema(cnx, mysql_schema_name)
 mysql_schema.set_tabkle_defaults(args.rowcount, args.rows_per_insert)
-menu_adjust_creation_properties()
-validate_all_tables_rows_created()
+print mysql_schema.tables[0].columns[0].data_generator.possible_value_count
+#print mysql_schema.tables[0].columns[0].data_generator.generate_data()
+#print mysql_schema.tables[0].columns[0].data_generator.generate_data()
 
-final_check = raw_input("Are you sure you would like to write random data to the %s schema? [y/n]: " % mysql_schema_name)
-if final_check in ['Y', 'y']:
-	print "Creating Data.  Please wait."
-	mysql_schema.generate_data()
-else:	
-	print "Bye!"
+
+#menu_adjust_creation_properties()
+#validate_all_tables_rows_created()
+
+#final_check = raw_input("Are you sure you would like to write random data to the %s schema? [y/n]: " % mysql_schema_name)
+#if final_check in ['Y', 'y']:
+#	print "Creating Data.  Please wait."
+#	mysql_schema.generate_data()
+#else:	
+#	print "Bye!"

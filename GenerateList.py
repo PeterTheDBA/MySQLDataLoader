@@ -10,12 +10,19 @@ class GenerateList:
 			column_type_start_index = 5
 		self.possible_values = (self.column_type[column_type_start_index:(len(self.column_type)-2)]).split("\',\'")
 	
+	def set_possible_value_count(self):
+		if self.data_type == "enum":
+			self.possible_value_count = len(self.possible_values)
+		elif self.data_type == "set":
+			self.possible_value_count = 2 ** len(self.possible_values) - 1
+	
 	def __init__(self, data_type, column_type, is_unique):
 		self.data_type = data_type
 		self.column_type = column_type
 		self.is_unique = is_unique
 		self.value = None
 		self.set_possible_values()
+		self.set_possible_value_count()
 	
 	def set_first_value(self):
 		self.value_index = 0

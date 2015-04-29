@@ -34,12 +34,16 @@ class GenerateInteger:
 				self.min_val = -9223372036854775808
 			self.max_val = abs(self.min_val + 1)
 			
+	def set_possible_value_count(self):
+		self.possible_value_count = self.max_val - self.min_val
+			
 	def __init__(self, data_type, is_unsigned, is_unique):	
 		self.data_type = data_type
 		self.is_unsigned = is_unsigned
 		self.is_unique = is_unique
 		self.value = None
 		self.get_value_range()
+		self.set_possible_value_count()
 		
 	def set_first_value(self):
 		self.value = self.min_val

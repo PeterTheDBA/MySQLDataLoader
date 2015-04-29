@@ -4,9 +4,10 @@ import random
 class GenerateString:
 
 	def set_possible_values(self):
-		self.possible_values = string.letters + " " + string.digits + string.punctuation.translate(None, "'\\#")
+		#TODO: insert logic that, if unique uses this set of chars, if not, use full spectrum
+		self.possible_values = string.ascii_uppercase + string.digits + string.punctuation.translate(None, "'\\#")
 		self.possible_values_max_index = len(self.possible_values) - 1
-
+	
 	def __init__(self, data_type, character_maximum_length, is_unique):
 		self.data_type = data_type
 		self.character_maximum_length = character_maximum_length
@@ -46,7 +47,7 @@ class GenerateString:
 		self.value = ""
 		for i in range(random_string_length):
 			self.value += random.choice(self.possible_values)
-	
+			
 	def generate_data(self):
 		if self.is_unique == False:
 			self.set_random_value()

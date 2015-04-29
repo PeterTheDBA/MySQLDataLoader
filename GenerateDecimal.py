@@ -5,7 +5,7 @@ class GenerateDecimal:
 
 	def set_scale_denom(self):
 		self.scale_denominator = 10 ** self.numeric_scale
-		
+
 	def __init__(self, data_type, numeric_precision, numeric_scale, is_unsigned, is_unique):
 		self.data_type = data_type
 		self.numeric_precision = numeric_precision
@@ -32,8 +32,8 @@ class GenerateDecimal:
 		if self.is_unsigned == False and random.getrandbits(1):
 			self.value =  decimal.Decimal(rand_int) / decimal.Decimal(self.scale_denominator) * -1
 		else:
-			self.value =  decimal.Decimal(rand_int) / decimal.Decimal(self.scale_denominator)		
-	
+			self.value =  decimal.Decimal(rand_int) / decimal.Decimal(self.scale_denominator)
+		
 	def generate_data(self):
 		if self.is_unique == False:
 			self.set_random_value()

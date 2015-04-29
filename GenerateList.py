@@ -9,7 +9,7 @@ class GenerateList:
 		elif self.data_type == "set":
 			column_type_start_index = 5
 		self.possible_values = (self.column_type[column_type_start_index:(len(self.column_type)-2)]).split("\',\'")
-
+	
 	def __init__(self, data_type, column_type, is_unique):
 		self.data_type = data_type
 		self.column_type = column_type
@@ -54,7 +54,7 @@ class GenerateList:
 			for val in random.sample(self.possible_values,random.randrange(len(self.possible_values))+1):
 				self.value += val + ","
 			self.value = (self.value[:-1])
-	
+			
 	def generate_data(self):
 		if self.is_unique == False:
 			self.set_random_value()

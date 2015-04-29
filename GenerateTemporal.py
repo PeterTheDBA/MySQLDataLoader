@@ -18,7 +18,6 @@ class GenerateTemporal:
 		self.value = None
 		self.get_value_range()
 
-		
 	def set_first_value(self):
 		self.value = self.min_val
 	

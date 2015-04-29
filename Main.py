@@ -2,6 +2,7 @@ import argparse
 import getpass
 import MySQLdb
 from Schema import Schema
+import string
 
 def set_mysql_session_variables(cnx):
 	cursor = cnx.cursor()

@@ -33,7 +33,7 @@ class GenerateInteger:
 			if self.data_type == "bigint":
 				self.min_val = -9223372036854775808
 			self.max_val = abs(self.min_val + 1)
-	
+			
 	def __init__(self, data_type, is_unsigned, is_unique):	
 		self.data_type = data_type
 		self.is_unsigned = is_unsigned

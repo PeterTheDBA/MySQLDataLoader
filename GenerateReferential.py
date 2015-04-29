@@ -21,13 +21,12 @@ class GenerateReferential:
 		cursor.execute(query)
 		for row in cursor.fetchall():
 			self.possible_values.append(row[0])
-		
+	
 	def generate_data(self):
 		if len(self.possible_values) == 0:
 			self.get_referential_values()
 		if self.is_unique == True:
-			#print "I'm here"
 			self.last_sequential_index += 1
-			return  "'%s'" % (self.possible_values[self.last_sequential_index]) 
+			return  self.possible_values[self.last_sequential_index]
 		else:
-			return "'%s'" % (random.choice(self.possible_values))
+			return (random.choice(self.possible_values))

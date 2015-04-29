@@ -27,6 +27,6 @@ class GenerateReferential:
 			self.get_referential_values()
 		if self.is_unique == True:
 			self.last_sequential_index += 1
-			return  "'%s'" % (self.possible_values[self.last_sequential_index]) 
+			return  self.possible_values[self.last_sequential_index]
 		else:
-			return "'%s'" % (random.choice(self.possible_values))
+			return (random.choice(self.possible_values))

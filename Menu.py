@@ -4,7 +4,7 @@ class Menu:
 	def __init__(self, schema):
 		self.schema = schema
 		self.table_menu_option = ["Adjust rows to be created", "Done"]
-		
+
 	def menu_picker(self, menu_list):
 		menu_number = 1
 		for schema in menu_list:
@@ -32,18 +32,19 @@ class Menu:
 				self.schema.tables[table_index].rows_to_generate = lowest_limiting_reference_row_count - self.schema.tables[table_index].rows_exists_in_table
 				print "Due to limiting references on %s, number of rows in this table cannot exceed %s.  The number of rows to be created has been reduced to %s" % (self.schema.tables[table_index].table_name, lowest_limiting_reference_row_count, self.schema.tables[table_index].rows_to_generate)
 				
+	
+				
 	def validate_all_tables_rows_to_be_created(self):
 		for i in range(0, len(self.schema.tables)):
 			validate_table_rows_to_be_created(i)
 	
-	def menu_adjust_creation_properties(self):
+	def main_menu(self):
 		#print "The following will apply in the data creation."
 		#print "Rows to be created per table: " + str(args.rowcount)
 		#table_menu_continue = raw_input("Would you like to change any of these properties for any table or column? [y/n]: ")
 		#TODO: input validation
 		#TODO: create y_n picker function so to not dup code
 		#validate that there are any tables to use before loading prompt
-		print self.schema.table_list
 		table_menu_continue = 'y'
 		while table_menu_continue in ['Y', 'y']:
 			print "Please select what table you would like to adjust."
@@ -58,3 +59,11 @@ class Menu:
 			else:
 				table_menu_continue = 0
 
+
+
+#final_check = raw_input("Are you sure you would like to write random data to the %s schema? [y/n]: " % mysql_schema_name)
+#if final_check in ['Y', 'y']:
+#	print "Creating Data.  Please wait."
+#
+#else:	
+#	print "Bye!"

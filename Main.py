@@ -1,8 +1,9 @@
 import argparse
 import getpass
 import MySQLdb
-from Schema import Schema
 import string
+from Schema import Schema
+from Menu import Menu
 
 def set_mysql_session_variables(cnx):
 	cursor = cnx.cursor()
@@ -102,16 +103,15 @@ if args.socket != None:
 else:
 	cnx = MySQLdb.connect(host=args.host, user=args.user, passwd=args.password, port=args.port)
 
-print len(string.ascii_uppercase + string.digits + string.punctuation.translate(None, "'\\#"))
 	
 mysql_schema_name = validate_schema_name(args.database, get_schema_list(cnx))
 set_mysql_session_variables(cnx)
 print "Loading information about %s schema.  Please wait." % (mysql_schema_name)
 mysql_schema = Schema(cnx, mysql_schema_name)
 mysql_schema.set_tabkle_defaults(args.rowcount, args.rows_per_insert)
-print mysql_schema.tables[0].columns[0].data_generator.possible_value_count
-#print mysql_schema.tables[0].columns[0].data_generator.generate_data()
-#print mysql_schema.tables[0].columns[0].data_generator.generate_data()
+
+menu = Menu(mysql_schema)
+menu.menu_adjust_creation_properties()
 
 
 #menu_adjust_creation_properties()

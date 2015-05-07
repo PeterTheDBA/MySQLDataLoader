@@ -14,8 +14,8 @@ class Menu:
 		user_selection = int(raw_input("Please enter selection: "))
 		#TODO: input validation
 		return user_selection
-
-	def validate_table_rows_to_be_created(self, table_index):
+		
+	def validate_table_rows_to_be_created_referential(self, table_index):
 		limiting_referenced_tables = []
 		for i in self.schema.tables[table_index].table_references:
 			if i['LIMITING_REFERNCE']:
@@ -30,13 +30,26 @@ class Menu:
 			resulting_rows_validated_table = self.schema.tables[table_index].rows_exists_in_table + self.schema.tables[table_index].rows_to_generate	
 			if lowest_limiting_reference_row_count < resulting_rows_validated_table:
 				self.schema.tables[table_index].rows_to_generate = lowest_limiting_reference_row_count - self.schema.tables[table_index].rows_exists_in_table
-				print "Due to limiting references on %s, number of rows in this table cannot exceed %s.  The number of rows to be created has been reduced to %s" % (self.schema.tables[table_index].table_name, lowest_limiting_reference_row_count, self.schema.tables[table_index].rows_to_generate)
+				print "WARNING: Due to limiting references on %s, number of rows in this table cannot exceed %s.  The number of rows to be created has been reduced to %s" % (self.schema.tables[table_index].table_name, lowest_limiting_reference_row_count, self.schema.tables[table_index].rows_to_generate)
 				
-	
+	def validate_table_rows_to_be_created_unique_not_null(self, table_index):
+		max_rows_to_create = None
+		for column in self.schema.tables[table_index].columns:
+			if column.is_unique and column.is_nullable == False and column.max_unique_values != None and (max_rows_to_create == None or column.max_unique_values < max_rows_to_create):
+				max_rows_to_create = column.max_unique_values
+		if max_rows_to_create != None and max_rows_to_create < self.schema.tables[table_index].rows_to_generate:
+			self.schema.tables[table_index].rows_to_generate = max_rows_to_create
+			print "WARNING: Due to unique, not nullable columns, the numer of rows to be created in table %s has been reduced to %s" % (self.schema.tables[table_index].table_name, self.schema.tables[table_index].rows_to_generate)				
+
+	def validate_table_rows_to_be_created(self, table_index):
+		self.validate_table_rows_to_be_created_unique_not_null(table_index)
+		self.validate_table_rows_to_be_created_referential(table_index)
 				
 	def validate_all_tables_rows_to_be_created(self):
 		for i in range(0, len(self.schema.tables)):
-			validate_table_rows_to_be_created(i)
+			self.validate_table_rows_to_be_created_unique_not_null(i)
+		for i in range(0, len(self.schema.tables)):
+			self.validate_table_rows_to_be_created_referential(i)
 	
 	def main_menu(self):
 		#print "The following will apply in the data creation."

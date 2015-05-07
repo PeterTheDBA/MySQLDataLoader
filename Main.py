@@ -58,9 +58,11 @@ print "Loading information about %s schema.  Please wait." % (mysql_schema_name)
 mysql_schema = Schema(cnx, mysql_schema_name)
 mysql_schema.set_tabkle_defaults(args.rowcount, args.rows_per_insert)
 
-menu = Menu(mysql_schema)
-menu.main_menu()
+#TODO: possible split validation into it's own class
 
-#validate_all_tables_rows_created()
-#print "Creating Data.  Please wait."
-#mysql_schema.generate_data()
+menu = Menu(mysql_schema)
+menu.validate_all_tables_rows_to_be_created()
+menu.main_menu()
+menu.validate_all_tables_rows_to_be_created()
+print "Creating Data.  Please wait."
+mysql_schema.generate_data()

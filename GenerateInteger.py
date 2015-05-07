@@ -35,7 +35,7 @@ class GenerateInteger:
 			self.max_val = abs(self.min_val + 1)
 			
 	def set_possible_value_count(self):
-		self.possible_value_count = self.max_val - self.min_val
+		self.possible_value_count = self.max_val - self.min_val + 1
 			
 	def __init__(self, data_type, is_unsigned, is_unique):	
 		self.data_type = data_type

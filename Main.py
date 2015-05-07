@@ -102,6 +102,8 @@ if args.socket != None:
 else:
 	cnx = MySQLdb.connect(host=args.host, user=args.user, passwd=args.password, port=args.port)
 
+print len(string.ascii_uppercase + string.digits + string.punctuation.translate(None, "'\\#"))
+	
 mysql_schema_name = validate_schema_name(args.database, get_schema_list(cnx))
 set_mysql_session_variables(cnx)
 print "Loading information about %s schema.  Please wait." % (mysql_schema_name)

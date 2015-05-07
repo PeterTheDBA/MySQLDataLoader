@@ -11,12 +11,21 @@ class GenerateTemporal:
 		elif self.data_type == "timestamp":
 			self.min_val = datetime.datetime(1970,1,1,0,0,1)
 			self.max_val = datetime.datetime(2038,1,19,3,14,07)
+
+	def set_possible_value_count(self):
+		if self.data_type == "time":
+			self.possible_value_count = 86400
+		elif self.data_type == "date":
+			self.possible_value_count = (self.max_val - self.min_val).days
+		else:
+			self.possible_value_count = (self.max_val - self.min_val).days * 86400
 	
 	def __init__(self, data_type, is_unique):
 		self.data_type = data_type
 		self.is_unique = is_unique
 		self.value = None
 		self.get_value_range()
+		self.set_possible_value_count()
 
 	def set_first_value(self):
 		self.value = self.min_val
@@ -28,7 +37,8 @@ class GenerateTemporal:
 			self.value = self.value + datetime.timedelta(0,1)
 	
 	def set_random_value(self):
-		secondstoadvance = random.randrange((self.max_val - self.min_val).days * 86400 + (self.max_val - self.min_val).seconds)
+		#secondstoadvance = random.randrange((self.max_val - self.min_val).days * 86400 + (self.max_val - self.min_val).seconds)
+		secondstoadvance = random.randrange((self.max_val - self.min_val).days * 86400)
 		self.value = self.min_val + datetime.timedelta(seconds=secondstoadvance)
 	
 	def generate_data(self):

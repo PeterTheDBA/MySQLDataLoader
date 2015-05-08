@@ -4,6 +4,7 @@ from GenerateString import GenerateString
 from GenerateTemporal import GenerateTemporal
 from GenerateList import GenerateList
 from GenerateReferential import GenerateReferential
+import random
 
 class Column:
 		
@@ -83,6 +84,7 @@ class Column:
 		self.set_data_generator()
 		self.set_is_data_quoted()
 		self.set_max_unique_values()
+		self.null_percentage_chance = 0
 	
 	def get_existing_values(self):
 		cursor = self.cnx.cursor()
@@ -97,7 +99,7 @@ class Column:
 		cursor.close()
 		
 	def generate_data(self):
-		if self.is_auto_inc == True:
+		if self.is_auto_inc == True or (self.is_nullable and random.randrange(1,100) <= self.null_percentage_chance):
 			return "NULL"
 		else:
 			data_val = self.data_generator.generate_data()

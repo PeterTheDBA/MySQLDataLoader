@@ -74,10 +74,15 @@ class Schema:
 		self.generate_tables()
 		self.set_tables_load_group_ordinal()
 		
-	def set_tabkle_defaults(self, rows_to_create, rows_per_insert):
+	def set_table_defaults(self, rows_to_create, rows_per_insert):
 		for table in self.tables:
 			table.rows_to_generate = rows_to_create
 			table.rows_per_insert = rows_per_insert
+	
+	def set_column_defaults(self, null_percentage_chance):
+		for table in self.tables:
+			for column in table.columns:
+				column.null_percentage_chance = null_percentage_chance
 			
 	def generate_data(self):
 		self.mysql_change_schema_focus()

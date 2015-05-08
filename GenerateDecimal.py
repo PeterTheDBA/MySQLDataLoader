@@ -6,6 +6,11 @@ class GenerateDecimal:
 	def set_scale_denom(self):
 		self.scale_denominator = 10 ** self.numeric_scale
 
+	def set_possible_value_count(self):
+		self.possible_value_count = 10 ** self.numeric_precision
+		if self.is_unsigned == False:
+			self.possible_value_count = self.possible_value_count * 2 - 1
+
 	def __init__(self, data_type, numeric_precision, numeric_scale, is_unsigned, is_unique):
 		self.data_type = data_type
 		self.numeric_precision = numeric_precision
@@ -17,10 +22,11 @@ class GenerateDecimal:
 			self.numeric_precision = 19
 			self.numeric_scale = 5
 		self.set_scale_denom()
+		self.set_possible_value_count()
 		
 	def set_first_value(self):
 		if self.is_unsigned == True:
-			self.value =  decimal.Decimal(1) / self.scale_denominator
+			self.value =  decimal.Decimal(0) / self.scale_denominator
 		else:
 			self.value = decimal.Decimal(-1) + (decimal.Decimal(1) / self.scale_denominator)
 	

@@ -54,6 +54,12 @@ class Column:
 			self.is_data_quoted = True
 		else:
 			self.is_data_quoted = False
+			
+	def set_max_unique_values(self):
+		if self.referenced_table != None:
+			self.max_unique_values = None
+		else:
+			self.max_unique_values = self.data_generator.possible_value_count
 		
 	def __init__(self, cnx, column_name, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_scale, column_type, is_auto_inc, is_unique, 
 	referenced_schema, referenced_table, referenced_column, table_name):
@@ -76,6 +82,7 @@ class Column:
 		self.set_is_unsigned()
 		self.set_data_generator()
 		self.set_is_data_quoted()
+		self.set_max_unique_values()
 	
 	def get_existing_values(self):
 		cursor = self.cnx.cursor()

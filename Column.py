@@ -57,7 +57,7 @@ class Column:
 			self.is_data_quoted = False
 			
 	def set_max_unique_values(self):
-		if self.referenced_table != None:
+		if self.referenced_table != None or self.is_auto_inc:
 			self.max_unique_values = None
 		else:
 			self.max_unique_values = self.data_generator.possible_value_count
@@ -102,10 +102,14 @@ class Column:
 		if self.is_auto_inc == True or (self.is_nullable and random.randrange(1,100) <= self.null_percentage_chance):
 			return "NULL"
 		else:
-			data_val = self.data_generator.generate_data()
-			while str(data_val) in self.existing_values:
+			data_val = None
+			if self.is_unique == False or self.data_generator.values_generated < self.data_generator.possible_value_count:
+				data_val = self.data_generator.generate_data()				
+			while self.is_unique and self.data_generator.values_generated < self.data_generator.possible_value_count and str(data_val) in self.existing_values:
 				data_val = self.data_generator.generate_data()
-			if self.is_data_quoted == False:
+			if data_val == None:
+				return "NULL"
+			elif self.is_data_quoted == False:
 				return data_val
 			elif self.is_data_quoted == True:
 				return "'%s'" % (data_val)

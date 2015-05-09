@@ -21,6 +21,7 @@ class GenerateList:
 		self.column_type = column_type
 		self.is_unique = is_unique
 		self.value = None
+		self.values_generated = 0
 		self.set_possible_values()
 		self.set_possible_value_count()
 	
@@ -70,4 +71,5 @@ class GenerateList:
 				self.set_first_value()
 			else:
 				self.set_next_value()
+		self.values_generated += 1
 		return self.value

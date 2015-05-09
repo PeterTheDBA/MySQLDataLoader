@@ -21,6 +21,7 @@ class GenerateDecimal:
 		if self.data_type in ["float", "double"]:
 			self.numeric_precision = 19
 			self.numeric_scale = 5
+		self.values_generated = 0
 		self.set_scale_denom()
 		self.set_possible_value_count()
 		
@@ -48,4 +49,5 @@ class GenerateDecimal:
 				self.set_first_value()
 			else:
 				self.set_next_value()
+		self.values_generated += 1
 		return self.value

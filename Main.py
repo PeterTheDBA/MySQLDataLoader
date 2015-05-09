@@ -61,9 +61,9 @@ mysql_schema.set_table_defaults(args.rowcount, args.rows_per_insert)
 mysql_schema.set_column_defaults(args.null_percentage_chance)
 #TODO: possible split validation into it's own class
 
-#menu = Menu(mysql_schema)
-#menu.validate_all_tables_rows_to_be_created()
-#menu.main_menu()
-#menu.validate_all_tables_rows_to_be_created()
+menu = Menu(mysql_schema)
+menu.validate_all_tables_rows_to_be_created()
+menu.main_menu()
+menu.validate_all_tables_rows_to_be_created()
 print "Creating Data.  Please wait."
 mysql_schema.generate_data()

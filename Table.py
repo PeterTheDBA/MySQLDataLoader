@@ -50,6 +50,7 @@ class Table:
 		self.table_load_ordinal_group = None
 		self.rows_to_generate = None
 		self.rows_per_insert = None
+		self.rows_generated = 0
 		self.generate_columns()
 		self.set_table_references()
 		self.get_rows_exists_in_table()
@@ -69,9 +70,20 @@ class Table:
 			if i != record_count - 1:
 				insert_statement += ","
 		return insert_statement
+	
+	def get_column_referential_values(self):
+		for column in self.columns:
+			if column.referenced_table != None and column.data_generator.values_generated == 0:
+				column.data_generator.get_referential_values()	
 		
 	def insert_data(self):
+		#If the data loader is referential, it can't load it's referential values until it's this table/columns turn to generate data
+		#as the table that it references very likely has been changes in the time since this class was instantiated into an object.
+		#Check to see no values have been generated, if so load referential values
+		if self.rows_generated == 0:
+			self.get_column_referential_values()
 		cursor = self.cnx.cursor()
 		cursor.execute(self.generate_insert_statement(self.rows_to_generate))
 		self.cnx.commit()
 		cursor.close()
+		self.rows_generated += self.rows_to_generate

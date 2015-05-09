@@ -42,6 +42,7 @@ class GenerateInteger:
 		self.is_unsigned = is_unsigned
 		self.is_unique = is_unique
 		self.value = None
+		self.values_generated = 0
 		self.get_value_range()
 		self.set_possible_value_count()
 		
@@ -62,4 +63,5 @@ class GenerateInteger:
 				self.set_first_value()
 			else:
 				self.set_next_value()
+		self.values_generated += 1
 		return self.value

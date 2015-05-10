@@ -20,6 +20,7 @@ def get_schema_list(cnx):
     cursor.execute(query)
     for schema in cursor:
         schema_list.append(schema[0])
+	cursor.close()
     return schema_list
 	
 def validate_schema_name(schema_name, schema_list):

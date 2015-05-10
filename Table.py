@@ -76,6 +76,7 @@ class Table:
 					self.rows_to_generate = values_available
 		if self.rows_to_generate != original_rows_to_generate:
 			print "WARENING: Rows to be created in table %s reduced to %s due to unique, not nullable constraints and lack of available referential resources" % (self.table_name, self.rows_to_generate)
+		cursor.close()
 			
 	
 	def get_column_referential_values(self):

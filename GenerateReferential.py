@@ -23,6 +23,7 @@ class GenerateReferential:
 		for row in cursor.fetchall():
 			self.possible_values.append(row[0])
 		self.possible_value_count = len(self.possible_values)
+		cursor.close()
 	
 	def generate_data(self):
 		self.values_generated += 1

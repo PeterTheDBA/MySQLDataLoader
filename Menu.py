@@ -30,7 +30,7 @@ class Menu:
 			resulting_rows_validated_table = self.schema.tables[table_index].rows_exists_in_table + self.schema.tables[table_index].rows_to_generate	
 			if lowest_limiting_reference_row_count < resulting_rows_validated_table:
 				self.schema.tables[table_index].rows_to_generate = lowest_limiting_reference_row_count - self.schema.tables[table_index].rows_exists_in_table
-				print "WARNING: Due to limiting references on %s, number of rows in this table cannot exceed %s.  The number of rows to be created has been reduced to %s" % (self.schema.tables[table_index].table_name, lowest_limiting_reference_row_count, self.schema.tables[table_index].rows_to_generate)
+				print "WARNING: Due to limited references, the number of rows to be created in table %s has been reduced to %s." % (self.schema.tables[table_index].table_name, lowest_limiting_reference_row_count)
 				
 	def validate_table_rows_to_be_created_unique_not_null(self, table_index):
 		max_rows_to_create = None
@@ -67,16 +67,7 @@ class Menu:
 			if table_menu_selection_index == 0:
 				print "The number of records to be create in table %s is %s" % (self.schema.tables[table_index].table_name, self.schema.tables[table_index].rows_to_generate)
 				self.schema.tables[table_index].rows_to_generate = int(raw_input("How many records should be created in this table? "))
-				self.validate_table_rows_to_be_created(table_index)
+				self.validate_all_tables_rows_to_be_created()
 				table_menu_continue = raw_input("Would you like to adjust the properties of any other tables? [y/n]: ")
 			else:
 				table_menu_continue = 0
-
-
-
-#final_check = raw_input("Are you sure you would like to write random data to the %s schema? [y/n]: " % mysql_schema_name)
-#if final_check in ['Y', 'y']:
-#	print "Creating Data.  Please wait."
-#
-#else:	
-#	print "Bye!"

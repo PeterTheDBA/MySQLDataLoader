@@ -30,7 +30,7 @@ class Table:
 					self.table_references.append(table_reference)
 	
 	def get_rows_exists_in_table(self):
-		query = "SELECT COUNT(1) FROM %s" % self.table_name
+		query = "SELECT COUNT(1) FROM `%s`" % self.table_name
 		cursor = self.cnx.cursor()
 		cursor.execute(query)
 		self.rows_exists_in_table = cursor.fetchone()[0]
@@ -69,7 +69,7 @@ class Table:
 		cursor = self.cnx.cursor()
 		for column in self.columns:
 			if column.referenced_table != None and column.is_unique and column.is_nullable == False:
-				query = "SELECT COUNT(distinct %s) FROM %s.%s where %s is not null" % (column.referenced_column, column.referenced_schema, column.referenced_table, column.referenced_column)
+				query = "SELECT COUNT(distinct `%s`) FROM `%s`.`%s` where `%s` is not null" % (column.referenced_column, column.referenced_schema, column.referenced_table, column.referenced_column)
 				cursor.execute(query)
 				values_available = cursor.fetchone()[0]
 				if values_available < self.rows_to_generate:

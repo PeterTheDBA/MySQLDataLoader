@@ -64,9 +64,9 @@ class Column:
 
 	def get_existing_values(self):
 		cursor = self.cnx.cursor()
-		query = ("SELECT UPPER(CAST(%s as CHAR)) "
-		"FROM %s "
-		"WHERE %s IS NOT NULL"
+		query = ("SELECT UPPER(CAST(`%s` as CHAR)) "
+		"FROM `%s` "
+		"WHERE `%s` IS NOT NULL"
 		% (self.column_name, self.table_name, self.column_name))
 		cursor.execute(query)
 		query_result = cursor.fetchall()

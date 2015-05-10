@@ -15,9 +15,9 @@ class GenerateReferential:
 
 	def get_referential_values(self):
 		cursor = self.cnx.cursor()
-		query = ("SELECT DISTINCT %s "
-			"FROM %s.%s "
-			"WHERE %s IS NOT NULL "
+		query = ("SELECT DISTINCT `%s` "
+			"FROM `%s`.`%s` "
+			"WHERE `%s` IS NOT NULL "
 			"LIMIT 10000" % (self.reference_column, self.reference_schema, self.reference_table, self.reference_column))
 		cursor.execute(query)
 		for row in cursor.fetchall():

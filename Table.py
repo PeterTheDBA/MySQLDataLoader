@@ -36,11 +36,11 @@ class Table:
 		self.rows_exists_in_table = cursor.fetchone()[0]
 		cursor.close()
 
-	def get_unique_column_existing_values(self):
-		if self.rows_exists_in_table > 0:
-			for column in self.columns:
-				if column.is_unique:
-					column.get_existing_values()		
+	#def get_unique_column_existing_values(self):
+	#	if self.rows_exists_in_table > 0:
+	#		for column in self.columns:
+	#			if column.is_unique:
+	#				column.get_existing_values()		
 		
 	def __init__(self, cnx, table_name, table_definition):
 		self.cnx = cnx
@@ -54,7 +54,7 @@ class Table:
 		self.generate_columns()
 		self.set_table_references()
 		self.get_rows_exists_in_table()
-		self.get_unique_column_existing_values()
+		#self.get_unique_column_existing_values()
 
 	def generate_insert_values(self):
 		values_statement = "("

@@ -35,8 +35,8 @@ class Menu:
 	def validate_table_rows_to_be_created_unique_not_null(self, table_index):
 		max_rows_to_create = None
 		for column in self.schema.tables[table_index].columns:
-			if column.is_unique and column.is_nullable == False and column.max_unique_values != None and (max_rows_to_create == None or column.max_unique_values < max_rows_to_create):
-				max_rows_to_create = column.max_unique_values
+			if column.is_unique and column.is_nullable == False and column.max_unique_values != None and (max_rows_to_create == None or column.max_unique_values - column.existing_unique_value_count < max_rows_to_create):
+				max_rows_to_create = column.max_unique_values - column.existing_unique_value_count
 		if max_rows_to_create != None and max_rows_to_create < self.schema.tables[table_index].rows_to_generate:
 			self.schema.tables[table_index].rows_to_generate = max_rows_to_create
 			print "WARNING: Due to unique, not nullable columns, the numer of rows to be created in table %s has been reduced to %s" % (self.schema.tables[table_index].table_name, self.schema.tables[table_index].rows_to_generate)				

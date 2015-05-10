@@ -88,7 +88,7 @@ class Schema:
 		self.mysql_change_schema_focus()
 		for ordinal_group in range(1, self.max_ordinal_group + 1):
 			for table in self.tables:
-				if table.table_load_ordinal_group == ordinal_group:
+				if table.table_load_ordinal_group == ordinal_group and table.rows_to_generate > 0:
 					table.validate_unique_not_null_referential_rows_to_create()
 					table.get_column_referential_values()
 					table.insert_data()

@@ -24,6 +24,7 @@ class GenerateTemporal:
 		self.data_type = data_type
 		self.is_unique = is_unique
 		self.value = None
+		self.values_generated = 0
 		self.get_value_range()
 		self.set_possible_value_count()
 
@@ -49,6 +50,7 @@ class GenerateTemporal:
 				self.set_first_value()
 			else:
 				self.set_next_value()
+		self.values_generated += 1
 		if self.data_type == "date":
 			return self.value.date()
 		elif self.data_type == "time":

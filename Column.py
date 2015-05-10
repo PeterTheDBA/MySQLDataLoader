@@ -4,6 +4,7 @@ from GenerateString import GenerateString
 from GenerateTemporal import GenerateTemporal
 from GenerateList import GenerateList
 from GenerateReferential import GenerateReferential
+import random
 
 class Column:
 		
@@ -56,11 +57,24 @@ class Column:
 			self.is_data_quoted = False
 			
 	def set_max_unique_values(self):
-		if self.referenced_table != None:
+		if self.referenced_table != None or self.is_auto_inc:
 			self.max_unique_values = None
 		else:
 			self.max_unique_values = self.data_generator.possible_value_count
-		
+
+	def get_existing_values(self):
+		cursor = self.cnx.cursor()
+		query = ("SELECT UPPER(CAST(`%s` as CHAR)) "
+		"FROM `%s` "
+		"WHERE `%s` IS NOT NULL"
+		% (self.column_name, self.table_name, self.column_name))
+		cursor.execute(query)
+		query_result = cursor.fetchall()
+		for row in query_result:
+			self.existing_values.append(row[0])
+		cursor.close()
+		self.existing_unique_value_count = len(self.existing_values)
+			
 	def __init__(self, cnx, column_name, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_scale, column_type, is_auto_inc, is_unique, 
 	referenced_schema, referenced_table, referenced_column, table_name):
 		self.column_name = column_name
@@ -83,27 +97,22 @@ class Column:
 		self.set_data_generator()
 		self.set_is_data_quoted()
 		self.set_max_unique_values()
-	
-	def get_existing_values(self):
-		cursor = self.cnx.cursor()
-		query = ("SELECT UPPER(CAST(%s as CHAR)) "
-		"FROM %s "
-		"WHERE %s IS NOT NULL"
-		% (self.column_name, self.table_name, self.column_name))
-		cursor.execute(query)
-		query_result = cursor.fetchall()
-		for row in query_result:
-			self.existing_values.append(row[0])
-		cursor.close()
-		
+		self.null_percentage_chance = 0
+		if self.is_unique:
+			self.get_existing_values()
+			
 	def generate_data(self):
-		if self.is_auto_inc == True:
+		if self.is_auto_inc == True or (self.is_nullable and random.randrange(1,100) <= self.null_percentage_chance):
 			return "NULL"
 		else:
-			data_val = self.data_generator.generate_data()
-			while str(data_val) in self.existing_values:
+			data_val = None
+			if self.is_unique == False or self.data_generator.values_generated < self.data_generator.possible_value_count:
+				data_val = self.data_generator.generate_data()				
+			while self.is_unique and self.data_generator.values_generated < self.data_generator.possible_value_count and str(data_val) in self.existing_values:
 				data_val = self.data_generator.generate_data()
-			if self.is_data_quoted == False:
+			if data_val == None:
+				return "NULL"
+			elif self.is_data_quoted == False:
 				return data_val
 			elif self.is_data_quoted == True:
 				return "'%s'" % (data_val)

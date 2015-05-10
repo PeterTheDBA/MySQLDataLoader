@@ -11,20 +11,22 @@ class GenerateReferential:
 		self.is_unique = is_unique
 		self.last_sequential_index = -1
 		self.possible_values = []
+		self.values_generated = 0
 
 	def get_referential_values(self):
 		cursor = self.cnx.cursor()
-		query = ("SELECT DISTINCT %s "
-			"FROM %s.%s "
-			"WHERE %s IS NOT NULL "
+		query = ("SELECT DISTINCT `%s` "
+			"FROM `%s`.`%s` "
+			"WHERE `%s` IS NOT NULL "
 			"LIMIT 10000" % (self.reference_column, self.reference_schema, self.reference_table, self.reference_column))
 		cursor.execute(query)
 		for row in cursor.fetchall():
 			self.possible_values.append(row[0])
+		self.possible_value_count = len(self.possible_values)
+		cursor.close()
 	
 	def generate_data(self):
-		if len(self.possible_values) == 0:
-			self.get_referential_values()
+		self.values_generated += 1
 		if self.is_unique == True:
 			self.last_sequential_index += 1
 			return  self.possible_values[self.last_sequential_index]

@@ -20,6 +20,7 @@ def get_schema_list(cnx):
     cursor.execute(query)
     for schema in cursor:
         schema_list.append(schema[0])
+	cursor.close()
     return schema_list
 	
 def validate_schema_name(schema_name, schema_list):
@@ -41,6 +42,7 @@ argparser.add_argument("-S", "--socket", help="For connections to localhost, the
 argparser.add_argument("-u", "--user", default=getpass.getuser(), help="The MySQL user name to use when connecting to the server.")
 argparser.add_argument("-r", "--rowcount", default=10000, type=int, help="The default number of rows to create per table.")
 argparser.add_argument("-i", "--rows_per_insert", default=500, type=int, help="The default number of rows to create per insert statement.")
+argparser.add_argument("--null_percentage_chance", default=5, type=int, help="The percentage likelihood of a null being passed into a nullable field")
 args = argparser.parse_args()
 
 if args.password == None:
@@ -56,8 +58,8 @@ mysql_schema_name = validate_schema_name(args.database, get_schema_list(cnx))
 set_mysql_session_variables(cnx)
 print "Loading information about %s schema.  Please wait." % (mysql_schema_name)
 mysql_schema = Schema(cnx, mysql_schema_name)
-mysql_schema.set_tabkle_defaults(args.rowcount, args.rows_per_insert)
-
+mysql_schema.set_table_defaults(args.rowcount, args.rows_per_insert)
+mysql_schema.set_column_defaults(args.null_percentage_chance)
 #TODO: possible split validation into it's own class
 
 menu = Menu(mysql_schema)

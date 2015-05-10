@@ -23,6 +23,7 @@ class GenerateString:
 		self.is_unique = is_unique
 		self.set_possible_values()
 		self.value = None
+		self.values_generated = 0
 		self.set_possible_value_count()
 	
 	def set_first_value(self):
@@ -66,4 +67,5 @@ class GenerateString:
 				self.set_first_value()
 			else:
 				self.set_next_value()
+		self.values_generated += 1
 		return self.value

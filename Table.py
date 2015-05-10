@@ -30,17 +30,11 @@ class Table:
 					self.table_references.append(table_reference)
 	
 	def get_rows_exists_in_table(self):
-		query = "SELECT COUNT(1) FROM %s" % self.table_name
+		query = "SELECT COUNT(1) FROM `%s`" % self.table_name
 		cursor = self.cnx.cursor()
 		cursor.execute(query)
 		self.rows_exists_in_table = cursor.fetchone()[0]
 		cursor.close()
-
-	def get_unique_column_existing_values(self):
-		if self.rows_exists_in_table > 0:
-			for column in self.columns:
-				if column.is_unique:
-					column.get_existing_values()		
 		
 	def __init__(self, cnx, table_name, table_definition):
 		self.cnx = cnx
@@ -50,10 +44,10 @@ class Table:
 		self.table_load_ordinal_group = None
 		self.rows_to_generate = None
 		self.rows_per_insert = None
+		self.rows_generated = 0
 		self.generate_columns()
 		self.set_table_references()
 		self.get_rows_exists_in_table()
-		self.get_unique_column_existing_values()
 
 	def generate_insert_values(self):
 		values_statement = "("
@@ -69,9 +63,30 @@ class Table:
 			if i != record_count - 1:
 				insert_statement += ","
 		return insert_statement
+	
+	def validate_unique_not_null_referential_rows_to_create(self):
+		original_rows_to_generate = self.rows_to_generate
+		cursor = self.cnx.cursor()
+		for column in self.columns:
+			if column.referenced_table != None and column.is_unique and column.is_nullable == False:
+				query = "SELECT COUNT(distinct `%s`) FROM `%s`.`%s` where `%s` is not null" % (column.referenced_column, column.referenced_schema, column.referenced_table, column.referenced_column)
+				cursor.execute(query)
+				values_available = cursor.fetchone()[0]
+				if values_available < self.rows_to_generate:
+					self.rows_to_generate = values_available
+		if self.rows_to_generate != original_rows_to_generate:
+			print "WARENING: Rows to be created in table %s reduced to %s due to unique, not nullable constraints and lack of available referential resources" % (self.table_name, self.rows_to_generate)
+		cursor.close()
+			
+	
+	def get_column_referential_values(self):
+		for column in self.columns:
+			if column.referenced_table != None and column.data_generator.values_generated == 0:
+				column.data_generator.get_referential_values()
 		
 	def insert_data(self):
 		cursor = self.cnx.cursor()
 		cursor.execute(self.generate_insert_statement(self.rows_to_generate))
 		self.cnx.commit()
 		cursor.close()
+		self.rows_generated += self.rows_to_generate

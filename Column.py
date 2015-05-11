@@ -79,7 +79,6 @@ class Column:
 	def __init__(self, cnx, column_name, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_scale, column_type, is_auto_inc, is_unique, 
 	referenced_schema, referenced_table, referenced_column, table_name):
 		self.last_generated_value = None
-		self.records_generated = 0
 		self.column_name = column_name
 		self.is_nullable = is_nullable
 		self.data_type = data_type
@@ -94,7 +93,7 @@ class Column:
 		self.referenced_column = referenced_column
 		self.cnx = cnx
 		self.table_name = table_name
-		self.cardinality = 5
+		self.cardinality = None
 		self.cardinality_iterative = 0
 		self.existing_values = []
 		self.set_base_data_type()
@@ -117,20 +116,24 @@ class Column:
 			return "NULL"
 		else:
 			data_val = None
-			if self.cardinality != None:
-				if self.last_generated_value == None:
-					data_val = self.data_generator.generate_data()
-					self.cardinality_iterative += 1
-				elif (self.data_generator.values_generated % 2 == 0 and self.cardinality_iterative < int(math.ceil(rows_to_generate / self.cardinality))) or (self.data_generator.values_generated % 2 == 1 and self.cardinality_iterative < int(math.floor(rows_to_generate / self.cardinality))) or self.cardinality == 1:
-					data_val = self.last_generated_value
-					self.cardinality_iterative += 1
+			if self.is_unique:
+				while data_val == None and self.data_generator.values_generated < self.data_generator.possible_value_count:
+					new_data_val = self.data_generator.generate_data()			
+					if str(new_data_val) not in self.existing_values:
+						data_val = new_data_val
+			else:
+				if self.cardinality != None:
+					if self.last_generated_value == None:
+						data_val = self.data_generator.generate_data()
+						self.cardinality_iterative += 1
+					elif (self.data_generator.values_generated % 2 == 0 and self.cardinality_iterative < int(math.ceil(rows_to_generate / self.cardinality))) or (self.data_generator.values_generated % 2 == 1 and self.cardinality_iterative < int(math.floor(rows_to_generate / self.cardinality))) or self.cardinality == 1:
+						data_val = self.last_generated_value
+						self.cardinality_iterative += 1
+					else:
+						data_val = self.data_generator.generate_data()
+						self.cardinality_iterative = 0
 				else:
 					data_val = self.data_generator.generate_data()
-					self.cardinality_iterative = 0
-			elif self.is_unique == False or self.data_generator.values_generated < self.data_generator.possible_value_count:
-				data_val = self.data_generator.generate_data()				
-			while self.is_unique and self.data_generator.values_generated < self.data_generator.possible_value_count and str(data_val) in self.existing_values:
-				data_val = self.data_generator.generate_data()
 			self.last_generated_value = data_val
 			if data_val == None:
 				return "NULL"
@@ -138,3 +141,4 @@ class Column:
 				return data_val
 			elif self.is_data_quoted == True:
 				return "'%s'" % (data_val)
+

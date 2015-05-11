@@ -80,7 +80,6 @@ class Column:
 	referenced_schema, referenced_table, referenced_column, table_name):
 		self.last_generated_value = None
 		self.records_generated = 0
-		self.data_requests = 0
 		self.column_name = column_name
 		self.is_nullable = is_nullable
 		self.data_type = data_type
@@ -95,7 +94,7 @@ class Column:
 		self.referenced_column = referenced_column
 		self.cnx = cnx
 		self.table_name = table_name
-		self.cardinality = None
+		self.cardinality = 5
 		self.cardinality_iterative = 0
 		self.existing_values = []
 		self.set_base_data_type()
@@ -122,8 +121,7 @@ class Column:
 				if self.last_generated_value == None:
 					data_val = self.data_generator.generate_data()
 					self.cardinality_iterative += 1
-					self.data_requests += 1
-				elif (self.data_requests % 2 == 0 and self.cardinality_iterative < int(math.ceil(rows_to_generate / self.cardinality))) or (self.data_requests % 2 == 1 and self.cardinality_iterative < int(math.floor(rows_to_generate / self.cardinality))) or self.cardinality == 1:
+				elif (self.data_generator.values_generated % 2 == 0 and self.cardinality_iterative < int(math.ceil(rows_to_generate / self.cardinality))) or (self.data_generator.values_generated % 2 == 1 and self.cardinality_iterative < int(math.floor(rows_to_generate / self.cardinality))) or self.cardinality == 1:
 					data_val = self.last_generated_value
 					self.cardinality_iterative += 1
 				else:

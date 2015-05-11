@@ -40,9 +40,12 @@ argparser.add_argument("-p", "--password", help="Connect to the MySQL server on 
 argparser.add_argument("-P", "--port", default=3306, type=int, help="The TCP/IP port number to use for the MySQL connection.")
 argparser.add_argument("-S", "--socket", help="For connections to localhost, the Unix socket file to use.")
 argparser.add_argument("-u", "--user", default=getpass.getuser(), help="The MySQL user name to use when connecting to the server.")
-argparser.add_argument("-r", "--rowcount", default=10000, type=int, help="The default number of rows to create per table.")
+argparser.add_argument("-r", "--default_rows_to_create", default=10000, type=int, help="The default number of rows to create per table.")
 argparser.add_argument("-i", "--rows_per_insert", default=500, type=int, help="The default number of rows to create per insert statement.")
-argparser.add_argument("--null_percentage_chance", default=5, type=int, help="The percentage likelihood of a null being passed into a nullable field")
+argparser.add_argument("-m", "--menu", action='store_true', help="Use this if you would like the menu, which allows for configuration of table and column level properties.")
+argparser.add_argument("--default_null_percentage_chance", default=5, type=int, help="The percentage likelihood of a null being passed into a nullable field")
+argparser.add_argument("--default_cardinality", default=None, type=int, help="The percentage likelihood of a null being passed into a nullable field")
+
 args = argparser.parse_args()
 
 if args.password == None:
@@ -58,13 +61,14 @@ mysql_schema_name = validate_schema_name(args.database, get_schema_list(cnx))
 set_mysql_session_variables(cnx)
 print "Loading information about %s schema.  Please wait." % (mysql_schema_name)
 mysql_schema = Schema(cnx, mysql_schema_name)
-mysql_schema.set_table_defaults(args.rowcount, args.rows_per_insert)
-mysql_schema.set_column_defaults(args.null_percentage_chance)
+mysql_schema.set_table_defaults(args.default_rows_to_create, args.rows_per_insert)
+mysql_schema.set_column_defaults(args.default_null_percentage_chance, args.default_cardinality)
 #TODO: possible split validation into it's own class
 
 menu = Menu(mysql_schema)
 menu.validate_all_tables_rows_to_be_created()
-menu.main_menu()
-menu.validate_all_tables_rows_to_be_created()
+if args.menu:
+	menu.main_menu()
+	menu.validate_all_tables_rows_to_be_created()
 print "Creating Data.  Please wait."
 mysql_schema.generate_data()

@@ -52,7 +52,7 @@ class Table:
 	def generate_insert_values(self):
 		values_statement = "("
 		for column in self.columns:
-			values_statement += str(column.generate_data()) + ","
+			values_statement += str(column.generate_data(self.rows_to_generate)) + ","
 		values_statement = values_statement[:-1] + ")"
 		return values_statement
 		
@@ -77,7 +77,6 @@ class Table:
 		if self.rows_to_generate != original_rows_to_generate:
 			print "WARENING: Rows to be created in table %s reduced to %s due to unique, not nullable constraints and lack of available referential resources" % (self.table_name, self.rows_to_generate)
 		cursor.close()
-			
 	
 	def get_column_referential_values(self):
 		for column in self.columns:

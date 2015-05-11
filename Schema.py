@@ -74,16 +74,17 @@ class Schema:
 		self.generate_tables()
 		self.set_tables_load_group_ordinal()
 		
-	def set_table_defaults(self, rows_to_create, rows_per_insert):
+	def set_table_defaults(self, rows_to_generate, rows_per_insert):
 		for table in self.tables:
-			table.rows_to_generate = rows_to_create
+			table.rows_to_generate = rows_to_generate
 			table.rows_per_insert = rows_per_insert
 	
-	def set_column_defaults(self, null_percentage_chance):
+	def set_column_defaults(self, null_percentage_chance, cardinality):
 		for table in self.tables:
 			for column in table.columns:
 				column.null_percentage_chance = null_percentage_chance
-			
+				column.cardinality = cardinality
+				
 	def generate_data(self):
 		self.mysql_change_schema_focus()
 		for ordinal_group in range(1, self.max_ordinal_group + 1):

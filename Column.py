@@ -105,12 +105,6 @@ class Column:
 		if self.is_unique:
 			self.get_existing_values()
 			
-	def set_cardinality(self, cardinality):
-		if self.is_unique or cardinality < 1:
-			print "Column is covered by a unique index or value was less than 1.  Cardinality cannot be applied"
-		else:
-			self.cardinality = cardinality
-			
 	def generate_data(self, rows_to_generate):
 		if self.is_auto_inc == True or (self.is_nullable and random.randrange(1,100) <= self.null_percentage_chance):
 			return "NULL"

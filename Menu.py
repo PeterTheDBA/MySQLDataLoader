@@ -1,3 +1,4 @@
+import sys
 
 class Menu:
 
@@ -71,3 +72,14 @@ class Menu:
 				table_menu_continue = raw_input("Would you like to adjust the properties of any other tables? [y/n]: ")
 			else:
 				table_menu_continue = 0
+				
+	def validate_safety(self, safety_off):
+		if safety_off == False:
+			rows_found = False
+			for table in self.schema.tables:
+				if table.rows_exists_in_table > 0:
+					rows_found = True
+					break
+			if rows_found:
+				print "ERROR: In order to prevent writing to a production system, this tool cannot create data in a schema that contains data.  If you still wish to write data to this schema, please run the tool again using --safety_off"
+				sys.exit(1)

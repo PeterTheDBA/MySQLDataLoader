@@ -6,9 +6,11 @@ import sys
 from Schema import Schema
 from Menu import Menu
 
-def set_mysql_session_variables(cnx):
+def set_mysql_session_variables(cnx, no_bin_log):
 	cursor = cnx.cursor()
 	query = "SET time_zone = '+00:00';"
+	if no_bin_log:
+		query += " SET sql_log_bin = 0;"
 	cursor.execute(query)
 	cursor.close()
 	
@@ -47,6 +49,7 @@ argparser.add_argument("-m", "--menu", action='store_true', help="Use this if yo
 argparser.add_argument("--default_null_percentage_chance", default=5, type=int, help="The percentage likelihood of a null being passed into a nullable field")
 argparser.add_argument("--default_cardinality", default=None, type=int, help="The percentage likelihood of a null being passed into a nullable field")
 argparser.add_argument("--safety_off", action='store_true', help="Puts the tool in unsafe mode, which allows you generate data in schemas that already have data in them.  Please note that in some cases, this can use a lot of memory, use at your own risk")
+argparser.add_argument("--no_bin_log", action='store_true', help="Disabled writing to the bin log for this session")
 
 
 args = argparser.parse_args()
@@ -61,7 +64,7 @@ else:
 
 	
 mysql_schema_name = validate_schema_name(args.database, get_schema_list(cnx))
-set_mysql_session_variables(cnx)
+set_mysql_session_variables(cnx, args.no_bin_log)
 print "Loading information about %s schema.  Please wait." % (mysql_schema_name)
 mysql_schema = Schema(cnx, mysql_schema_name)
 mysql_schema.set_table_defaults(args.default_rows_to_create, args.rows_per_insert)

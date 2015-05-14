@@ -2,6 +2,7 @@ import argparse
 import getpass
 import MySQLdb
 import string
+import sys
 from Schema import Schema
 from Menu import Menu
 
@@ -45,6 +46,8 @@ argparser.add_argument("-i", "--rows_per_insert", default=500, type=int, help="T
 argparser.add_argument("-m", "--menu", action='store_true', help="Use this if you would like the menu, which allows for configuration of table and column level properties.")
 argparser.add_argument("--default_null_percentage_chance", default=5, type=int, help="The percentage likelihood of a null being passed into a nullable field")
 argparser.add_argument("--default_cardinality", default=None, type=int, help="The percentage likelihood of a null being passed into a nullable field")
+argparser.add_argument("--safety_off", action='store_true', help="Puts the tool in unsafe mode, which allows you generate data in schemas that already have data in them.  Please note that in some cases, this can use a lot of memory, use at your own risk")
+
 
 args = argparser.parse_args()
 
@@ -64,11 +67,14 @@ mysql_schema = Schema(cnx, mysql_schema_name)
 mysql_schema.set_table_defaults(args.default_rows_to_create, args.rows_per_insert)
 mysql_schema.set_column_defaults(args.default_null_percentage_chance, args.default_cardinality)
 #TODO: possible split validation into it's own class
-
+		
 menu = Menu(mysql_schema)
 menu.validate_all_tables_rows_to_be_created()
+menu.validate_safety(args.safety_off)
+
 if args.menu:
 	menu.main_menu()
 	menu.validate_all_tables_rows_to_be_created()
 print "Creating Data.  Please wait."
 mysql_schema.generate_data()
+sys.exit(0)

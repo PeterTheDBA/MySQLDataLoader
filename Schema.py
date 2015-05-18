@@ -79,11 +79,12 @@ class Schema:
 			table.rows_to_generate = rows_to_generate
 			table.rows_per_insert = rows_per_insert
 	
-	def set_column_defaults(self, null_percentage_chance, cardinality):
+	def set_column_defaults(self, null_percentage_chance, cardinality, referential_sample_size):
 		for table in self.tables:
 			for column in table.columns:
 				column.null_percentage_chance = null_percentage_chance
 				column.cardinality = cardinality
+				column.referential_sample_size = referential_sample_size
 				
 	def generate_data(self):
 		self.mysql_change_schema_focus()

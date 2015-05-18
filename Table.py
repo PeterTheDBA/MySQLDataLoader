@@ -81,7 +81,7 @@ class Table:
 	def get_column_referential_values(self):
 		for column in self.columns:
 			if column.referenced_table != None and column.data_generator.values_generated == 0:
-				column.data_generator.get_referential_values()
+				column.get_referential_values(self.rows_to_generate)
 		
 	def insert_data(self):
 		itr_rows_to_generate = 0

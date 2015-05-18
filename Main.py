@@ -48,6 +48,7 @@ argparser.add_argument("-m", "--menu", action='store_true', help="Use this if yo
 argparser.add_argument("--default_rows_per_insert", default=50, type=int, help="The default number of rows to create per insert statement.")
 argparser.add_argument("--default_null_percentage_chance", default=5, type=int, help="The percentage likelihood of a null being passed into a nullable field")
 argparser.add_argument("--default_cardinality", default=None, type=int, help="The percentage likelihood of a null being passed into a nullable field")
+argparser.add_argument("--default_referential_sample_size", default=5000, type=int, help="This sets the number of values that will be retrieved from the databases when generating data from a referential source.  Reducing this number will reduce cardinality, but will also reduce the amount of memory used by the program.  Note that a cardinality property or a unique column will override referential sample size")
 argparser.add_argument("--safety_off", action='store_true', help="Puts the tool in unsafe mode, which allows you generate data in schemas that already have data in them.  Please note that in some cases, this can use a lot of memory, use at your own risk")
 argparser.add_argument("--no_bin_log", action='store_true', help="Disabled writing to the bin log for this session")
 
@@ -63,14 +64,15 @@ else:
 	cnx = MySQLdb.connect(host=args.host, user=args.user, passwd=args.password, port=args.port)
 
 	
-mysql_schema_name = validate_schema_name(args.database, get_schema_list(cnx))
+# TODO: Fix when working on menu / validation "mysql_schema_name = validate_schema_name(args.database, get_schema_list(cnx))
+mysql_schema_name = args.database
+#TODO: possible split validation into it's own class
 set_mysql_session_variables(cnx, args.no_bin_log)
 print "Loading information about %s schema.  Please wait." % (mysql_schema_name)
 mysql_schema = Schema(cnx, mysql_schema_name)
 mysql_schema.set_table_defaults(args.default_rows_to_create, args.default_rows_per_insert)
-mysql_schema.set_column_defaults(args.default_null_percentage_chance, args.default_cardinality)
-#TODO: possible split validation into it's own class
-		
+mysql_schema.set_column_defaults(args.default_null_percentage_chance, args.default_cardinality, args.default_referential_sample_size)
+
 menu = Menu(mysql_schema)
 menu.validate_all_tables_rows_to_be_created()
 menu.validate_safety(args.safety_off)

@@ -64,14 +64,15 @@ else:
 	cnx = MySQLdb.connect(host=args.host, user=args.user, passwd=args.password, port=args.port)
 
 	
-mysql_schema_name = validate_schema_name(args.database, get_schema_list(cnx))
+# TODO: Fix when working on menu / validation "mysql_schema_name = validate_schema_name(args.database, get_schema_list(cnx))
+mysql_schema_name = args.database
+#TODO: possible split validation into it's own class
 set_mysql_session_variables(cnx, args.no_bin_log)
 print "Loading information about %s schema.  Please wait." % (mysql_schema_name)
 mysql_schema = Schema(cnx, mysql_schema_name)
 mysql_schema.set_table_defaults(args.default_rows_to_create, args.default_rows_per_insert)
 mysql_schema.set_column_defaults(args.default_null_percentage_chance, args.default_cardinality, args.default_referential_sample_size)
-#TODO: possible split validation into it's own class
-		
+
 menu = Menu(mysql_schema)
 menu.validate_all_tables_rows_to_be_created()
 menu.validate_safety(args.safety_off)

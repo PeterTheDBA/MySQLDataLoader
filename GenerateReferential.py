@@ -13,12 +13,12 @@ class GenerateReferential:
 		self.possible_values = []
 		self.values_generated = 0
 
-	def get_referential_values(self):
+	def get_referential_values(self, referential_sample_size):
 		cursor = self.cnx.cursor()
 		query = ("SELECT DISTINCT `%s` "
 			"FROM `%s`.`%s` "
 			"WHERE `%s` IS NOT NULL "
-			"LIMIT 10000" % (self.reference_column, self.reference_schema, self.reference_table, self.reference_column))
+			"LIMIT %s" % (self.reference_column, self.reference_schema, self.reference_table, self.reference_column, str(referential_sample_size)))
 		cursor.execute(query)
 		for row in cursor.fetchall():
 			self.possible_values.append(row[0])

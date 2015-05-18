@@ -91,6 +91,7 @@ class Column:
 		self.referenced_schema = referenced_schema
 		self.referenced_table = referenced_table
 		self.referenced_column = referenced_column
+		self.referential_sample_size = None
 		self.cnx = cnx
 		self.table_name = table_name
 		self.cardinality = None
@@ -104,6 +105,14 @@ class Column:
 		self.null_percentage_chance = 0
 		if self.is_unique:
 			self.get_existing_values()
+	
+	def get_referential_values(self, rows_to_generate):
+		referential_sample_size = self.referential_sample_size
+		if self.is_unique:
+			referential_sample_size = rows_to_generate
+		elif self.cardinality != None:
+			referential_sample_size = self.cardinality
+		self.data_generator.get_referential_values(referential_sample_size)
 			
 	def generate_data(self, rows_to_generate):
 		if self.is_auto_inc == True or (self.is_nullable and random.randrange(1,100) <= self.null_percentage_chance):
@@ -135,4 +144,3 @@ class Column:
 				return data_val
 			elif self.is_data_quoted == True:
 				return "'%s'" % (data_val)
-

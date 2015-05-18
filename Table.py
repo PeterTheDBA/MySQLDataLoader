@@ -84,8 +84,15 @@ class Table:
 				column.data_generator.get_referential_values()
 		
 	def insert_data(self):
+		itr_rows_to_generate = 0
 		cursor = self.cnx.cursor()
-		cursor.execute(self.generate_insert_statement(self.rows_to_generate))
-		self.cnx.commit()
+		while self.rows_generated < self.rows_to_generate:
+			if self.rows_generated + self.rows_per_insert <= self.rows_to_generate:
+				itr_rows_to_generate = self.rows_per_insert
+			else:
+				itr_rows_to_generate = self.rows_to_generate - self.rows_generated
+			cursor.execute(self.generate_insert_statement(itr_rows_to_generate))
+			self.rows_generated += itr_rows_to_generate
+			self.cnx.commit()
 		cursor.close()
-		self.rows_generated += self.rows_to_generate
+		

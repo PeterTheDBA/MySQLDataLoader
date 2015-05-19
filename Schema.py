@@ -74,11 +74,10 @@ class Schema:
 		self.generate_tables()
 		self.set_tables_load_group_ordinal()
 		
-	def set_table_defaults(self, rows_to_generate, rows_per_insert, seconds_between_inserts):
+	def set_table_defaults(self, rows_to_generate, rows_per_insert):
 		for table in self.tables:
 			table.rows_to_generate = rows_to_generate
 			table.rows_per_insert = rows_per_insert
-			table.seconds_between_inserts = seconds_between_inserts
 	
 	def set_column_defaults(self, null_percentage_chance, cardinality, referential_sample_size):
 		for table in self.tables:
@@ -87,14 +86,14 @@ class Schema:
 				column.cardinality = cardinality
 				column.referential_sample_size = referential_sample_size
 				
-	def generate_data(self):
+	def generate_data(self, seconds_between_inserts):
 		self.mysql_change_schema_focus()
 		for ordinal_group in range(1, self.max_ordinal_group + 1):
 			for table in self.tables:
 				if table.table_load_ordinal_group == ordinal_group and table.rows_to_generate > 0:
 					table.validate_unique_not_null_referential_rows_to_create()
 					table.get_column_referential_values()
-					table.insert_data()
+					table.insert_data(seconds_between_inserts)
 					
 	def get_table_index_from_name(self, table_name):
 		table_index = None

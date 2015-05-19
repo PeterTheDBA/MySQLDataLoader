@@ -74,10 +74,11 @@ class Schema:
 		self.generate_tables()
 		self.set_tables_load_group_ordinal()
 		
-	def set_table_defaults(self, rows_to_generate, rows_per_insert):
+	def set_table_defaults(self, rows_to_generate, rows_per_insert, seconds_between_inserts):
 		for table in self.tables:
 			table.rows_to_generate = rows_to_generate
 			table.rows_per_insert = rows_per_insert
+			table.seconds_between_inserts = seconds_between_inserts
 	
 	def set_column_defaults(self, null_percentage_chance, cardinality, referential_sample_size):
 		for table in self.tables:

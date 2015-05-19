@@ -1,4 +1,5 @@
 from Column import Column
+import time
 
 class Table:
 
@@ -45,6 +46,7 @@ class Table:
 		self.rows_to_generate = None
 		self.rows_per_insert = None
 		self.rows_generated = 0
+		self.seconds_between_inserts = 0
 		self.generate_columns()
 		self.set_table_references()
 		self.get_rows_exists_in_table()
@@ -87,6 +89,8 @@ class Table:
 		itr_rows_to_generate = 0
 		cursor = self.cnx.cursor()
 		while self.rows_generated < self.rows_to_generate:
+			if self.seconds_between_inserts > 0:
+				time.sleep(self.seconds_between_inserts)
 			if self.rows_generated + self.rows_per_insert <= self.rows_to_generate:
 				itr_rows_to_generate = self.rows_per_insert
 			else:

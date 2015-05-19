@@ -1,4 +1,5 @@
 from Column import Column
+import time
 
 class Table:
 
@@ -83,10 +84,12 @@ class Table:
 			if column.referenced_table != None and column.data_generator.values_generated == 0:
 				column.get_referential_values(self.rows_to_generate)
 		
-	def insert_data(self):
+	def insert_data(self, seconds_between_inserts):
 		itr_rows_to_generate = 0
 		cursor = self.cnx.cursor()
 		while self.rows_generated < self.rows_to_generate:
+			if seconds_between_inserts > 0:
+				time.sleep(seconds_between_inserts)
 			if self.rows_generated + self.rows_per_insert <= self.rows_to_generate:
 				itr_rows_to_generate = self.rows_per_insert
 			else:

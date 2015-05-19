@@ -51,6 +51,7 @@ argparser.add_argument("--default_cardinality", default=None, type=int, help="Th
 argparser.add_argument("--default_referential_sample_size", default=5000, type=int, help="This sets the number of values that will be retrieved from the databases when generating data from a referential source.  Reducing this number will reduce cardinality, but will also reduce the amount of memory used by the program.  Note that a cardinality property or a unique column will override referential sample size")
 argparser.add_argument("--safety_off", action='store_true', help="Puts the tool in unsafe mode, which allows you generate data in schemas that already have data in them.  Please note that in some cases, this can use a lot of memory, use at your own risk")
 argparser.add_argument("--no_bin_log", action='store_true', help="Disabled writing to the bin log for this session")
+argparser.add_argument("--seconds_between_inserts", default=0, type=int, help="The number of seconds between each insert statement")
 
 
 args = argparser.parse_args()
@@ -81,5 +82,5 @@ if args.menu:
 	menu.main_menu()
 	menu.validate_all_tables_rows_to_be_created()
 print "Creating Data.  Please wait."
-mysql_schema.generate_data()
+mysql_schema.generate_data(args.seconds_between_inserts)
 sys.exit(0)

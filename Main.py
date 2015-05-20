@@ -53,7 +53,6 @@ argparser.add_argument("--safety_off", action='store_true', help="Puts the tool 
 argparser.add_argument("--no_bin_log", action='store_true', help="Disabled writing to the bin log for this session")
 argparser.add_argument("--seconds_between_inserts", default=0, type=int, help="The number of seconds between each insert statement")
 
-
 args = argparser.parse_args()
 
 if args.password == None:

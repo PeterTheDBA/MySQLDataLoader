@@ -6,16 +6,6 @@ class Menu:
 		self.schema = schema
 		self.table_menu_option = ["Adjust rows to be created", "Done"]
 
-	def menu_picker(self, menu_list):
-		menu_number = 1
-		for schema in menu_list:
-			print "%s) %s" % (menu_number, schema)
-			menu_number += 1
-		#TODO: Add range specification to input prompt
-		user_selection = int(raw_input("Please enter selection: "))
-		#TODO: input validation
-		return user_selection
-		
 	def validate_table_rows_to_be_created_referential(self, table_index):
 		limiting_referenced_tables = []
 		for i in self.schema.tables[table_index].table_references:
@@ -51,6 +41,27 @@ class Menu:
 			self.validate_table_rows_to_be_created_unique_not_null(i)
 		for i in range(0, len(self.schema.tables)):
 			self.validate_table_rows_to_be_created_referential(i)
+			
+	def validate_safety(self, safety_off):
+		if safety_off == False:
+			rows_found = False
+			for table in self.schema.tables:
+				if table.rows_exists_in_table > 0:
+					rows_found = True
+					break
+			if rows_found:
+				print "ERROR: In order to prevent writing to a production system, this tool cannot create data in a schema that contains data.  If you still wish to write data to this schema, please run the tool again using --safety_off"
+				sys.exit(1)
+	
+	def menu_picker(self, menu_list):
+		menu_number = 1
+		for schema in menu_list:
+			print "%s) %s" % (menu_number, schema)
+			menu_number += 1
+		#TODO: Add range specification to input prompt
+		user_selection = int(raw_input("Please enter selection: "))
+		#TODO: input validation
+		return user_selection	
 	
 	def main_menu(self):
 		#print "The following will apply in the data creation."
@@ -73,13 +84,3 @@ class Menu:
 			else:
 				table_menu_continue = 0
 				
-	def validate_safety(self, safety_off):
-		if safety_off == False:
-			rows_found = False
-			for table in self.schema.tables:
-				if table.rows_exists_in_table > 0:
-					rows_found = True
-					break
-			if rows_found:
-				print "ERROR: In order to prevent writing to a production system, this tool cannot create data in a schema that contains data.  If you still wish to write data to this schema, please run the tool again using --safety_off"
-				sys.exit(1)

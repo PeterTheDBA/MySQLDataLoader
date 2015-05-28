@@ -1,5 +1,6 @@
 import MySQLdb
 from Table import Table
+from SchemaValidation import SchemaValidation
 
 class Schema:
 	
@@ -65,6 +66,9 @@ class Schema:
 				tables_pending_ordinal_group_assignment.remove(remove_table)
 		self.max_ordinal_group = ordinal_group
 	
+	def generate_schema_validator(self):
+		self.validator = SchemaValidation(self)
+	
 	def __init__(self, cnx, schema_name):
 		self.cnx = cnx
 		self.schema_name = schema_name
@@ -73,6 +77,7 @@ class Schema:
 		self.set_table_list()
 		self.generate_tables()
 		self.set_tables_load_group_ordinal()
+		self.generate_schema_validator()
 		
 	def set_table_defaults(self, rows_to_generate, rows_per_insert):
 		for table in self.tables:

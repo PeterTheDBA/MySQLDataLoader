@@ -72,14 +72,13 @@ print "Loading information about %s schema.  Please wait." % (mysql_schema_name)
 mysql_schema = Schema(cnx, mysql_schema_name)
 mysql_schema.set_table_defaults(args.default_rows_to_create, args.default_rows_per_insert)
 mysql_schema.set_column_defaults(args.default_null_percentage_chance, args.default_cardinality, args.default_referential_sample_size)
-
-menu = Menu(mysql_schema)
-menu.validate_all_tables_rows_to_be_created()
-menu.validate_safety(args.safety_off)
+mysql_schema.validator.validate_safety(args.safety_off)
+mysql_schema.validator.validate_all_tables_rows_to_be_created()
 
 if args.menu:
+	menu = Menu(mysql_schema)
 	menu.main_menu()
-	menu.validate_all_tables_rows_to_be_created()
-print "Creating Data.  Please wait."
-mysql_schema.generate_data(args.seconds_between_inserts)
+	mysql_schema.validator.validate_all_tables_rows_to_be_created()
+#print "Creating Data.  Please wait."
+#mysql_schema.generate_data(args.seconds_between_inserts)
 sys.exit(0)

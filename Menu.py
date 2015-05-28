@@ -4,7 +4,7 @@ class Menu:
 
 	def __init__(self, schema):
 		self.schema = schema
-		self.table_menu_option = ["Adjust rows to be created", "Adjust column properties"]
+		#TODO: Add validation functionality where needed
 
 	def list_picker(self, menu_list):
 		validation_required = True
@@ -35,29 +35,57 @@ class Menu:
 			print "Selection must be a positive integer."
 			user_input = raw_input(prompt)
 		return int(user_input)
-	
+		
+	def column_menu(self, table_index, column_index):
+		#TODO: QA This
+		column_menu_options = []
+		if self.schema.tables[table_index].columns[column_index].is_nullable:
+			column_menu_options.append("Set null percentage chance")
+		if self.schema.tables[table_index].columns[column_index].is_unique == False:
+			column_menu_options.append("Set cardinality")
+			if self.schema.tables[table_index].columns[column_index].referenced_table != None:
+				column_menu_options.append("Set referential sample size")
+		if len(column_menu_options) > 0:
+			print "COLUMN: " + self.schema.tables[table_index].columns[column_index].column_name
+			print "What column value would you like to adjust?"
+			user_selection_index = self.list_picker(column_menu_options)
+			while user_selection_index <= len(column_menu_options) - 1:
+				if column_menu_options[user_selection_index] == "Set null percentage chance":
+					self.schema.tables[table_index].columns[column_index].null_percentage_chance = self.int_picker("Null percentage chance: ")
+					print "Set to " + str(self.schema.tables[table_index].columns[column_index].null_percentage_chance)
+				elif column_menu_options[user_selection_index] == "Set cardinality":
+					self.schema.tables[table_index].columns[column_index].cardinality = self.int_picker("Cardinality: ")
+					print "Set to " + str(self.schema.tables[table_index].columns[column_index].cardinality)
+				elif column_menu_options[user_selection_index] == "Set referential sample size":
+					self.schema.tables[table_index].columns[column_index].referential_sample_size = self.int_picker("Referential sample size: ")
+					print "Set to " + str(self.schema.tables[table_index].columns[column_index].referential_sample_size)
+				print "What column value would you like to adjust?"
+				user_selection_index = self.list_picker(column_menu_options)
+		else:
+			"No configurable properties for this column"
+			
 	def table_column_menu(self, table_index):
 		print "Please select what column you would like to adjust."
 		column_index = self.list_picker(self.schema.tables[table_index].column_list)
 		while column_index <= len(self.schema.tables[table_index].column_list) - 1:
+			self.column_menu(table_index, column_index)
 			print "Please select what column you would like to adjust."
 			column_index = self.list_picker(self.schema.tables[table_index].column_list)		
 		
 	def table_menu(self, table_index):
+		table_menu_options = ["Adjust rows to be created", "Adjust column properties"]
 		print "TABLE: " + self.schema.tables[table_index].table_name
 		print "What table value would you like to adjust?"
-		user_selection_index = self.list_picker(self.table_menu_option)
-		while user_selection_index <= len(self.table_menu_option) - 1:
-			if self.table_menu_option[user_selection_index] == "Adjust rows to be created":
+		user_selection_index = self.list_picker(table_menu_options)
+		while user_selection_index <= len(table_menu_options) - 1:
+			if table_menu_options[user_selection_index] == "Adjust rows to be created":
 				self.schema.tables[table_index].rows_to_generate = self.int_picker("How many records should be created in this table?: ")
 				print "Set to " + str(self.schema.tables[table_index].rows_to_generate)
-			elif self.table_menu_option[user_selection_index] == "Adjust column properties":
+			elif table_menu_options[user_selection_index] == "Adjust column properties":
 				self.table_column_menu(table_index)
-			print "TABLE: " + self.schema.tables[table_index].table_name
 			print "What table value would you like to adjust?"
-			user_selection_index = self.list_picker(self.table_menu_option)
+			user_selection_index = self.list_picker(table_menu_options)
 			
-	
 	def main_menu(self):
 		print "Please select what table you would like to adjust."
 		table_index = self.list_picker(self.schema.table_list)
@@ -67,23 +95,3 @@ class Menu:
 			table_index = self.list_picker(self.schema.table_list)			
 		print "Menu Complete"
 		
-
-	#def main_menu(self):
-		#user_selection_index = None
-		#table_menu_continue = raw_input("Would you like to change any of these properties for any table or column? [y/n]: ")
-		#TODO: input validation
-		#TODO: create y_n picker function so to not dup code
-		#validate that there are any tables to use before loading prompt
-		#table_menu_continue = 'y'
-		#while table_menu_continue in ['Y', 'y']:
-
-		#print "What value would you like to adjust?"
-		#table_menu_selection_index = self.menu_picker(self.table_menu_option)-1
-		#if table_menu_selection_index == 0:
-		#	print "The number of records to be create in table %s is %s" % (self.schema.tables[table_index].table_name, self.schema.tables[table_index].rows_to_generate)
-		#	self.schema.tables[table_index].rows_to_generate = int(raw_input("How many records should be created in this table? "))
-		#	self.validate_all_tables_rows_to_be_created()
-		#	table_menu_continue = raw_input("Would you like to adjust the properties of any other tables? [y/n]: ")
-		#else:
-		#	table_menu_continue = 0
-				

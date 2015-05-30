@@ -53,5 +53,10 @@ class SchemaValidation:
 				sys.exit(1)
 				
 	#column validators
+	def validate_column_cardinality(self, table_index, column_index):
+		#if self.schema.tables[table_index].columns[column_index].cardinality != None and self.schema.tables[table_index].columns[column_index].cardinality > self.schema.tables[table_index].rows_to_generate
+		if self.schema.tables[table_index].columns[column_index].cardinality > self.schema.tables[table_index].rows_to_generate:
+			self.schema.tables[table_index].columns[column_index].cardinality = self.schema.tables[table_index].rows_to_generate
+			print "Cardinality in column %s.%s is higher than the number of records to be generated for the table.  Cardinality for this column has been reduced to %s." % (self.schema.tables[table_index].table_name, self.schema.tables[table_index].columns[column_index].column_name, self.schema.tables[table_index].columns[column_index].cardinality)
 	
 	#create master schema validator that will loop through all tables and columns and then loop through itself so it runs until no issues are detected

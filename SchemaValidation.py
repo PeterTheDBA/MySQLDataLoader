@@ -51,3 +51,7 @@ class SchemaValidation:
 			if rows_found:
 				print "ERROR: In order to prevent writing to a production system, this tool cannot create data in a schema that contains data.  If you still wish to write data to this schema, please run the tool again using --safety_off"
 				sys.exit(1)
+				
+	#column validators
+	
+	#create master schema validator that will loop through all tables and columns and then loop through itself so it runs until no issues are detected

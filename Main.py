@@ -79,6 +79,14 @@ if args.menu:
 	menu = Menu(mysql_schema)
 	menu.main_menu()
 	mysql_schema.validator.validate_all_tables_rows_to_be_created()
+	#TODO: have validation loop
 #print "Creating Data.  Please wait."
 #mysql_schema.generate_data(args.seconds_between_inserts)
-sys.exit(0)
+
+for table in mysql_schema.tables:
+	print "Rows to be created in table " + table.table_name + " is " + str(table.rows_to_generate)
+	for column in table.columns:
+		print "Column " + column.column_name
+		print "null_percentage_chance: " + str(column.null_percentage_chance) + " cardinality: " + str(column.cardinality) + " referential_sample_size: " + str(column.referential_sample_size)
+
+#sys.exit(0)

@@ -111,3 +111,7 @@ class Schema:
 			if self.tables[i].table_name == table_name:
 				table_index = i
 		return table_index;
+		
+	def analyze_all_tables(self):
+		for table_index in range(0, len(self.tables)):
+			self.tables[table_index].analyze()

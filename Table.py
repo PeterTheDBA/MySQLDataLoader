@@ -104,4 +104,9 @@ class Table:
 			self.rows_generated += itr_rows_to_generate
 			self.cnx.commit()
 		cursor.close()
-		
+	
+	def analyze(self):
+		cursor = self.cnx.cursor()
+		query = "ANALYZE TABLE %s" % self.table_name
+		cursor.execute(query)
+		cursor.close()		

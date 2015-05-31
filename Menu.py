@@ -4,82 +4,113 @@ class Menu:
 
 	def __init__(self, schema):
 		self.schema = schema
-		self.table_menu_option = ["Adjust rows to be created", "Done"]
 
-	def menu_picker(self, menu_list):
+	def list_picker(self, menu_list):
+		validation_required = True
 		menu_number = 1
-		for schema in menu_list:
-			print "%s) %s" % (menu_number, schema)
+		for choice in menu_list:
+			print "%s) %s" % (menu_number, choice)
 			menu_number += 1
-		#TODO: Add range specification to input prompt
-		user_selection = int(raw_input("Please enter selection: "))
-		#TODO: input validation
-		return user_selection
-		
-	def validate_table_rows_to_be_created_referential(self, table_index):
-		limiting_referenced_tables = []
-		for i in self.schema.tables[table_index].table_references:
-			if i['LIMITING_REFERNCE']:
-				limiting_referenced_tables.append(i)
-		if len(limiting_referenced_tables) > 0:
-			lowest_limiting_reference_row_count = None
-			for i in limiting_referenced_tables:
-				limiting_referenced_table_index = self.schema.get_table_index_from_name(i['REFERENCED_TABLE'])
-				limiting_reference_row_count = self.schema.tables[limiting_referenced_table_index].rows_exists_in_table + self.schema.tables[limiting_referenced_table_index].rows_to_generate
-				if limiting_reference_row_count < lowest_limiting_reference_row_count or lowest_limiting_reference_row_count == None:
-					lowest_limiting_reference_row_count = limiting_reference_row_count
-			resulting_rows_validated_table = self.schema.tables[table_index].rows_exists_in_table + self.schema.tables[table_index].rows_to_generate	
-			if lowest_limiting_reference_row_count < resulting_rows_validated_table:
-				self.schema.tables[table_index].rows_to_generate = lowest_limiting_reference_row_count - self.schema.tables[table_index].rows_exists_in_table
-				print "WARNING: Due to limited references, the number of rows to be created in table %s has been reduced to %s." % (self.schema.tables[table_index].table_name, lowest_limiting_reference_row_count)
-				
-	def validate_table_rows_to_be_created_unique_not_null(self, table_index):
-		max_rows_to_create = None
-		for column in self.schema.tables[table_index].columns:
-			if column.is_unique and column.is_nullable == False and column.max_unique_values != None and (max_rows_to_create == None or column.max_unique_values - column.existing_unique_value_count < max_rows_to_create):
-				max_rows_to_create = column.max_unique_values - column.existing_unique_value_count
-		if max_rows_to_create != None and max_rows_to_create < self.schema.tables[table_index].rows_to_generate:
-			self.schema.tables[table_index].rows_to_generate = max_rows_to_create
-			print "WARNING: Due to unique, not nullable columns, the numer of rows to be created in table %s has been reduced to %s" % (self.schema.tables[table_index].table_name, self.schema.tables[table_index].rows_to_generate)				
-
-	def validate_table_rows_to_be_created(self, table_index):
-		self.validate_table_rows_to_be_created_unique_not_null(table_index)
-		self.validate_table_rows_to_be_created_referential(table_index)
-				
-	def validate_all_tables_rows_to_be_created(self):
-		for i in range(0, len(self.schema.tables)):
-			self.validate_table_rows_to_be_created_unique_not_null(i)
-		for i in range(0, len(self.schema.tables)):
-			self.validate_table_rows_to_be_created_referential(i)
-	
-	def main_menu(self):
-		#print "The following will apply in the data creation."
-		#print "Rows to be created per table: " + str(args.rowcount)
-		#table_menu_continue = raw_input("Would you like to change any of these properties for any table or column? [y/n]: ")
-		#TODO: input validation
-		#TODO: create y_n picker function so to not dup code
-		#validate that there are any tables to use before loading prompt
-		table_menu_continue = 'y'
-		while table_menu_continue in ['Y', 'y']:
-			print "Please select what table you would like to adjust."
-			table_index = self.menu_picker(self.schema.table_list)-1
-			print "What value would you like to adjust?"
-			table_menu_selection_index = self.menu_picker(self.table_menu_option)-1
-			if table_menu_selection_index == 0:
-				print "The number of records to be create in table %s is %s" % (self.schema.tables[table_index].table_name, self.schema.tables[table_index].rows_to_generate)
-				self.schema.tables[table_index].rows_to_generate = int(raw_input("How many records should be created in this table? "))
-				self.validate_all_tables_rows_to_be_created()
-				table_menu_continue = raw_input("Would you like to adjust the properties of any other tables? [y/n]: ")
+		print "%s) %s" % (menu_number, "[Back/Exit]")
+		min_val = 1
+		max_val = menu_number
+		user_selection = raw_input("Please enter selection: [%s-%s] " % (min_val, max_val))
+		while validation_required:
+			if str(user_selection).isdigit():
+				user_selection = int(user_selection)
+				if user_selection >= min_val and user_selection <= max_val:
+					validation_required = False
+				else:
+					print "Selection much be in the appropriate range."
 			else:
-				table_menu_continue = 0
-				
-	def validate_safety(self, safety_off):
-		if safety_off == False:
-			rows_found = False
-			for table in self.schema.tables:
-				if table.rows_exists_in_table > 0:
-					rows_found = True
-					break
-			if rows_found:
-				print "ERROR: In order to prevent writing to a production system, this tool cannot create data in a schema that contains data.  If you still wish to write data to this schema, please run the tool again using --safety_off"
-				sys.exit(1)
+				print "Selection must be a positive integer."
+			if validation_required:
+				user_selection = raw_input("Please enter selection [%s-%s]: " % (min_val, max_val))
+		return user_selection - 1
+	
+	def int_picker(self, prompt, min_val, max_val, is_nullable):
+		validation_required = True
+		if min_val != None and max_val != None:
+			prompt = "%s[%s - %s] " % (prompt, min_val, max_val)
+		elif min_val != None and max_val == None:
+			prompt = "%s[Min Value %s] " % (prompt, min_val)
+		if is_nullable:
+			prompt = prompt + "[C to clear] "
+		user_input = raw_input(prompt)
+		while validation_required:
+			if str(user_input) in ['C', 'c']:
+				user_input = None
+				validation_required = False
+			elif str(user_input).isdigit():	
+				user_input = int(user_input)
+				if (min_val == None or user_input >= min_val) and (max_val == None or user_input <= max_val):
+					validation_required = False
+				else:
+					print "Selection much be in the appropriate range."
+			else:
+				print "Selection must be an integer."
+			if validation_required:
+				user_input = raw_input(prompt)
+		return user_input
+		
+	def column_menu(self, table_index, column_index):
+		column_menu_options = []
+		if self.schema.tables[table_index].columns[column_index].is_nullable:
+			column_menu_options.append("Set null percentage chance")
+		if self.schema.tables[table_index].columns[column_index].is_unique == False:
+			column_menu_options.append("Set cardinality")
+			if self.schema.tables[table_index].columns[column_index].referenced_table != None:
+				column_menu_options.append("Set referential sample size")
+		if len(column_menu_options) > 0:
+			print "COLUMN: " + self.schema.tables[table_index].columns[column_index].column_name
+			print "What column value would you like to adjust?"
+			user_selection_index = self.list_picker(column_menu_options)
+			while user_selection_index <= len(column_menu_options) - 1:
+				if column_menu_options[user_selection_index] == "Set null percentage chance":
+					self.schema.tables[table_index].columns[column_index].null_percentage_chance = self.int_picker("Null percentage chance: ", 0, 100, False)
+					print "Set to " + str(self.schema.tables[table_index].columns[column_index].null_percentage_chance)
+				elif column_menu_options[user_selection_index] == "Set cardinality":
+					self.schema.tables[table_index].columns[column_index].cardinality = self.int_picker("Cardinality: ", 1, None, True)
+					if self.schema.validator.validate_column_cardinality(table_index, column_index) == 0:
+						print "Set to " + str(self.schema.tables[table_index].columns[column_index].cardinality)
+				elif column_menu_options[user_selection_index] == "Set referential sample size":
+					self.schema.tables[table_index].columns[column_index].referential_sample_size = self.int_picker("Referential sample size: ", 1, None, False)
+					if self.schema.validator.validate_column_referential_sample_size(table_index, column_index) == 0:
+						print "Set to " + str(self.schema.tables[table_index].columns[column_index].referential_sample_size)
+				print "What column value would you like to adjust?"
+				user_selection_index = self.list_picker(column_menu_options)
+		else:
+			print "No configurable properties for this column"
+			
+	def table_column_menu(self, table_index):
+		print "Please select what column you would like to adjust."
+		column_index = self.list_picker(self.schema.tables[table_index].column_list)
+		while column_index <= len(self.schema.tables[table_index].column_list) - 1:
+			self.column_menu(table_index, column_index)
+			print "Please select what column you would like to adjust."
+			column_index = self.list_picker(self.schema.tables[table_index].column_list)		
+		
+	def table_menu(self, table_index):
+		table_menu_options = ["Adjust rows to be created", "Adjust column properties"]
+		print "TABLE: " + self.schema.tables[table_index].table_name
+		print "What table value would you like to adjust?"
+		user_selection_index = self.list_picker(table_menu_options)
+		while user_selection_index <= len(table_menu_options) - 1:
+			if table_menu_options[user_selection_index] == "Adjust rows to be created":
+				self.schema.tables[table_index].rows_to_generate = self.int_picker("How many records should be created in this table?: ", 1, None, False)
+				if self.schema.validator.validate_table_rows_to_be_created == 0:
+					print "Set to " + str(self.schema.tables[table_index].rows_to_generate)
+			elif table_menu_options[user_selection_index] == "Adjust column properties":
+				self.table_column_menu(table_index)
+			print "What table value would you like to adjust?"
+			user_selection_index = self.list_picker(table_menu_options)
+			
+	def main_menu(self):
+		print "Please select what table you would like to adjust."
+		table_index = self.list_picker(self.schema.table_list)
+		while table_index <= len(self.schema.table_list) - 1:
+			self.table_menu(table_index)
+			print "Please select what table you would like to adjust."
+			table_index = self.list_picker(self.schema.table_list)			
+		print "Menu Complete"
+		

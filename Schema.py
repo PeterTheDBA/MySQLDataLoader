@@ -89,7 +89,12 @@ class Schema:
 			for column in table.columns:
 				column.null_percentage_chance = null_percentage_chance
 				column.cardinality = cardinality
-				column.referential_sample_size = referential_sample_size
+				if column.referenced_table == None:
+					column.referential_sample_size = 0
+				elif referential_sample_size > table.rows_to_generate:
+					column.referential_sample_size = table.rows_to_generate
+				else:
+					column.referential_sample_size = referential_sample_size
 				
 	def generate_data(self, seconds_between_inserts):
 		self.mysql_change_schema_focus()

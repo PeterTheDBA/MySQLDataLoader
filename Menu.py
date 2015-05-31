@@ -71,14 +71,12 @@ class Menu:
 					print "Set to " + str(self.schema.tables[table_index].columns[column_index].null_percentage_chance)
 				elif column_menu_options[user_selection_index] == "Set cardinality":
 					self.schema.tables[table_index].columns[column_index].cardinality = self.int_picker("Cardinality: ", 1, None, True)
-					self.schema.validator.validate_column_cardinality(table_index, column_index)
-					print "Set to " + str(self.schema.tables[table_index].columns[column_index].cardinality)
+					if self.schema.validator.validate_column_cardinality(table_index, column_index) == 0:
+						print "Set to " + str(self.schema.tables[table_index].columns[column_index].cardinality)
 				elif column_menu_options[user_selection_index] == "Set referential sample size":
 					self.schema.tables[table_index].columns[column_index].referential_sample_size = self.int_picker("Referential sample size: ", 1, None, False)
-					#validate to ensure it's not higher than the rows to be created
-					#validate colunn is not unique
-					#validate the it does not exceed cardinality
-					print "Set to " + str(self.schema.tables[table_index].columns[column_index].referential_sample_size)
+					if self.schema.validator.validate_column_referential_sample_size(table_index, column_index) == 0:
+						print "Set to " + str(self.schema.tables[table_index].columns[column_index].referential_sample_size)
 				print "What column value would you like to adjust?"
 				user_selection_index = self.list_picker(column_menu_options)
 		else:
@@ -100,7 +98,8 @@ class Menu:
 		while user_selection_index <= len(table_menu_options) - 1:
 			if table_menu_options[user_selection_index] == "Adjust rows to be created":
 				self.schema.tables[table_index].rows_to_generate = self.int_picker("How many records should be created in this table?: ", 1, None, False)
-				print "Set to " + str(self.schema.tables[table_index].rows_to_generate)
+				if self.schema.validator.validate_table_rows_to_be_created == 0:
+					print "Set to " + str(self.schema.tables[table_index].rows_to_generate)
 			elif table_menu_options[user_selection_index] == "Adjust column properties":
 				self.table_column_menu(table_index)
 			print "What table value would you like to adjust?"

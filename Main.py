@@ -63,30 +63,21 @@ if args.socket != None:
 else:
 	cnx = MySQLdb.connect(host=args.host, user=args.user, passwd=args.password, port=args.port)
 
-	
-# TODO: Fix when working on menu / validation "mysql_schema_name = validate_schema_name(args.database, get_schema_list(cnx))
 mysql_schema_name = args.database
-#TODO: possible split validation into it's own class
 set_mysql_session_variables(cnx, args.no_bin_log)
 print "Loading information about %s schema.  Please wait." % (mysql_schema_name)
 mysql_schema = Schema(cnx, mysql_schema_name)
 mysql_schema.set_table_defaults(args.default_rows_to_create, args.default_rows_per_insert)
 mysql_schema.set_column_defaults(args.default_null_percentage_chance, args.default_cardinality, args.default_referential_sample_size)
 mysql_schema.validator.validate_safety(args.safety_off)
-mysql_schema.validator.validate_all_tables_rows_to_be_created()
+mysql_schema.validator.validate_all_data_creation_properties()
 
 if args.menu:
 	menu = Menu(mysql_schema)
 	menu.main_menu()
-	mysql_schema.validator.validate_all_tables_rows_to_be_created()
-	#TODO: have validation loop
-#print "Creating Data.  Please wait."
-#mysql_schema.generate_data(args.seconds_between_inserts)
+	mysql_schema.validator.validate_all_data_creation_properties()
 
-for table in mysql_schema.tables:
-	print "Rows to be created in table " + table.table_name + " is " + str(table.rows_to_generate)
-	for column in table.columns:
-		print "Column " + column.column_name
-		print "null_percentage_chance: " + str(column.null_percentage_chance) + " cardinality: " + str(column.cardinality) + " referential_sample_size: " + str(column.referential_sample_size)
+print "Creating Data.  Please wait."
+mysql_schema.generate_data(args.seconds_between_inserts)
 
-#sys.exit(0)
+sys.exit(0)

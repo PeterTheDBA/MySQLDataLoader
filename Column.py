@@ -117,9 +117,8 @@ class Column:
 		self.data_generator.get_referential_values(referential_sample_size)
 			
 	def generate_data(self, rows_to_generate):
-		if self.is_auto_inc == True or (self.is_nullable and random.randrange(1,100) <= self.null_percentage_chance):
+		if self.is_auto_inc == True or (self.is_nullable and random.randrange(1,100) <= self.null_percentage_chance and self.cardinality == None):
 			return "NULL"
-			#create logic for cardinality_iterative?
 		else:
 			data_val = None
 			if self.is_unique:
@@ -132,16 +131,18 @@ class Column:
 					if self.cardinality_rows_per_value_generated == None:
 						self.cardinality_rows_per_value_generated = rows_to_generate / self.cardinality
 						self.cardinality_values_with_extra_row = rows_to_generate % self.cardinality
+						
 					if self.cardinality_iterative == 0:
 						data_val = self.data_generator.generate_data()
 						self.cardinality_iterative += 1
-					elif self.cardinality_iterative < self.cardinality_rows_per_value_generated:
-						data_val = self.last_generated_value
+					elif self.cardinality_iterative < self.cardinality_rows_per_value_generated or (self.cardinality_iterative == self.cardinality_rows_per_value_generated and self.cardinality_values_with_extra_row > 0):
+						if self.is_nullable and random.randrange(1,100) <= self.null_percentage_chance:
+							data_val = None
+						else:
+							data_val = self.last_generated_value
+						if self.cardinality_iterative == self.cardinality_rows_per_value_generated:
+							self.cardinality_values_with_extra_row -= 1
 						self.cardinality_iterative += 1
-					elif self.cardinality_iterative == self.cardinality_rows_per_value_generated and self.cardinality_values_with_extra_row > 0:
-						data_val = self.last_generated_value
-						self.cardinality_iterative += 1
-						self.cardinality_values_with_extra_row -= 1
 					else:
 						data_val = self.data_generator.generate_data()
 						self.cardinality_iterative = 1

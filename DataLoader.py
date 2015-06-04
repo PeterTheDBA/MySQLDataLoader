@@ -4,8 +4,8 @@ import getpass
 import MySQLdb
 import string
 import sys
-from Schema import Schema
-from Menu import Menu
+from lib import Schema
+from lib import Menu
 
 def set_mysql_session_variables(cnx, no_bin_log):
 	cursor = cnx.cursor()
@@ -65,14 +65,14 @@ else:
 mysql_schema_name = args.database
 set_mysql_session_variables(cnx, args.no_bin_log)
 print "Loading information about %s schema.  Please wait." % (mysql_schema_name)
-mysql_schema = Schema(cnx, mysql_schema_name)
+mysql_schema = Schema.Schema(cnx, mysql_schema_name)
 mysql_schema.set_table_defaults(args.rows_to_create_per_table, args.rows_per_insert)
 mysql_schema.set_column_defaults(args.null_percentage_chance, args.cardinality, args.referential_sample_size)
 mysql_schema.validator.validate_safety(args.safety_off)
 mysql_schema.validator.validate_all_data_creation_properties()
 
 if args.menu:
-	menu = Menu(mysql_schema)
+	menu = Menu.Menu(mysql_schema)
 	menu.main_menu()
 	mysql_schema.validator.validate_all_data_creation_properties()
 

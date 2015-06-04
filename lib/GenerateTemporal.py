@@ -38,7 +38,6 @@ class GenerateTemporal:
 			self.value = self.value + datetime.timedelta(0,1)
 	
 	def set_random_value(self):
-		#secondstoadvance = random.randrange((self.max_val - self.min_val).days * 86400 + (self.max_val - self.min_val).seconds)
 		secondstoadvance = random.randrange((self.max_val - self.min_val).days * 86400)
 		self.value = self.min_val + datetime.timedelta(seconds=secondstoadvance)
 	

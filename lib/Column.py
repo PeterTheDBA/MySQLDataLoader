@@ -130,8 +130,7 @@ class Column:
 				if self.cardinality != None:
 					if self.cardinality_rows_per_value_generated == None:
 						self.cardinality_rows_per_value_generated = rows_to_generate / self.cardinality
-						self.cardinality_values_with_extra_row = rows_to_generate % self.cardinality
-						
+						self.cardinality_values_with_extra_row = rows_to_generate % self.cardinality			
 					if self.cardinality_iterative == 0:
 						data_val = self.data_generator.generate_data()
 						self.cardinality_iterative += 1

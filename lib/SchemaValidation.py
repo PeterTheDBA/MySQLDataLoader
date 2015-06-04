@@ -8,7 +8,7 @@ class SchemaValidation:
 	def validate_table_rows_to_be_created_referential(self, table_index):
 		limiting_referenced_tables = []
 		for i in self.schema.tables[table_index].table_references:
-			if i['LIMITING_REFERNCE']:
+			if i['LIMITING_REFERENCE']:
 				limiting_referenced_tables.append(i)
 		if len(limiting_referenced_tables) > 0:
 			lowest_limiting_reference_row_count = None

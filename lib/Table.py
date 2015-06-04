@@ -24,9 +24,9 @@ class Table:
 		self.table_references = []
 		for i in self.columns:
 			if i.referenced_table != None:
-				table_reference = {'REFERENCED_SCHEMA': i.referenced_schema, 'REFERENCED_TABLE': i.referenced_table, 'LIMITING_REFERNCE': False}
+				table_reference = {'REFERENCED_SCHEMA': i.referenced_schema, 'REFERENCED_TABLE': i.referenced_table, 'LIMITING_REFERENCE': False}
 				if i.is_unique and i.is_nullable == False:
-					table_reference['LIMITING_REFERNCE'] = True
+					table_reference['LIMITING_REFERENCE'] = True
 				if table_reference not in self.table_references:
 					self.table_references.append(table_reference)
 	
@@ -36,11 +36,6 @@ class Table:
 		cursor.execute(query)
 		self.rows_exists_in_table = cursor.fetchone()[0]
 		cursor.close()
-
-	def set_column_list(self):
-		self.column_list = []
-		for column in self.columns:
-			self.column_list.append(column.column_name)
 		
 	def __init__(self, cnx, table_name, table_definition):
 		self.cnx = cnx
@@ -54,7 +49,6 @@ class Table:
 		self.generate_columns()
 		self.set_table_references()
 		self.get_rows_exists_in_table()
-		self.set_column_list()
 
 	def generate_insert_values(self):
 		values_statement = "("
@@ -90,7 +84,7 @@ class Table:
 			if column.referenced_table != None and column.data_generator.values_generated == 0:
 				column.get_referential_values(self.rows_to_generate)
 		
-	def insert_data(self, seconds_between_inserts):
+	def generate_data(self, seconds_between_inserts):
 		itr_rows_to_generate = 0
 		cursor = self.cnx.cursor()
 		while self.rows_generated < self.rows_to_generate:

@@ -4,7 +4,6 @@ import random
 class GenerateString:
 
 	def set_possible_values(self):
-		#TODO: insert logic that, if unique uses this set of chars, if not, use full spectrum
 		self.possible_values = string.ascii_uppercase + string.digits + string.punctuation.translate(None, "'\\#")
 		self.possible_values_max_index = len(self.possible_values) - 1
 		

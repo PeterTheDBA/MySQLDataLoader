@@ -4,6 +4,18 @@ class Menu:
 
 	def __init__(self, schema):
 		self.schema = schema
+	
+	def get_table_names(self):
+		table_names = []
+		for table in self.schema.tables:
+			table_names.append(table.table_name)
+		return table_names		
+	
+	def get_column_names(self, table_index):
+		column_names = []
+		for column in self.schema.tables[table_index].columns:
+			column_names.append(column.column_name)
+		return column_names
 
 	def list_picker(self, menu_list):
 		validation_required = True
@@ -84,11 +96,12 @@ class Menu:
 			
 	def table_column_menu(self, table_index):
 		print "Please select what column you would like to adjust."
-		column_index = self.list_picker(self.schema.tables[table_index].column_list)
-		while column_index <= len(self.schema.tables[table_index].column_list) - 1:
+		column_names = self.get_column_names(table_index)
+		column_index = self.list_picker(column_names)
+		while column_index <= len(column_names) - 1:
 			self.column_menu(table_index, column_index)
 			print "Please select what column you would like to adjust."
-			column_index = self.list_picker(self.schema.tables[table_index].column_list)		
+			column_index = self.list_picker(column_names)		
 		
 	def table_menu(self, table_index):
 		table_menu_options = ["Adjust rows to be created", "Adjust column properties"]
@@ -107,10 +120,11 @@ class Menu:
 			
 	def main_menu(self):
 		print "Please select what table you would like to adjust."
-		table_index = self.list_picker(self.schema.table_list)
-		while table_index <= len(self.schema.table_list) - 1:
+		table_names = self.get_table_names()
+		table_index = self.list_picker(table_names)
+		while table_index <= len(table_names) - 1:
 			self.table_menu(table_index)
 			print "Please select what table you would like to adjust."
-			table_index = self.list_picker(self.schema.table_list)			
+			table_index = self.list_picker(table_names)			
 		print "Menu Complete"
 		

@@ -36,11 +36,6 @@ class Table:
 		cursor.execute(query)
 		self.rows_exists_in_table = cursor.fetchone()[0]
 		cursor.close()
-
-	def set_column_list(self):
-		self.column_list = []
-		for column in self.columns:
-			self.column_list.append(column.column_name)
 		
 	def __init__(self, cnx, table_name, table_definition):
 		self.cnx = cnx
@@ -54,7 +49,6 @@ class Table:
 		self.generate_columns()
 		self.set_table_references()
 		self.get_rows_exists_in_table()
-		self.set_column_list()
 
 	def generate_insert_values(self):
 		values_statement = "("

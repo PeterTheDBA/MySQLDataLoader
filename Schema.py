@@ -30,25 +30,24 @@ class Schema:
 		for row in query_result:
 			self.schema_definition.append(row)
 		cursor.close()
-		
-	def set_table_list(self):
-		self.table_list = []
-		for i in self.schema_definition:
-			if i['TABLE_NAME'] not in self.table_list:
-				self.table_list.append(i['TABLE_NAME'])
-	
+
 	def generate_tables(self):
+		table_names = []
+		for i in self.schema_definition:
+			if i['TABLE_NAME'] not in table_names:
+				table_names.append(i['TABLE_NAME'])
 		self.tables = []
-		for itr_table in self.table_list:
+		for itr_table in table_names:
 			table_definition = []
 			for i in self.schema_definition:
 				if i['TABLE_NAME'] == itr_table:
 					table_definition.append(i)
 			self.tables.append(Table(self.cnx, itr_table, table_definition))
 		
-	
 	def set_tables_load_group_ordinal(self):
-		tables_pending_ordinal_group_assignment = list(self.table_list)
+		tables_pending_ordinal_group_assignment = []
+		for table in self.tables:
+			tables_pending_ordinal_group_assignment.append(table.table_name)
 		ordinal_group = 0
 		while len(tables_pending_ordinal_group_assignment) != 0:
 			tables_to_remove_from_pending_list = []
@@ -74,7 +73,7 @@ class Schema:
 		self.schema_name = schema_name
 		self.mysql_change_schema_focus()
 		self.set_schema_definition()
-		self.set_table_list()
+		#self.set_table_list()
 		self.generate_tables()
 		self.set_tables_load_group_ordinal()
 		self.generate_schema_validator()

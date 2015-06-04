@@ -73,7 +73,6 @@ class Schema:
 		self.schema_name = schema_name
 		self.mysql_change_schema_focus()
 		self.set_schema_definition()
-		#self.set_table_list()
 		self.generate_tables()
 		self.set_tables_load_group_ordinal()
 		self.generate_schema_validator()

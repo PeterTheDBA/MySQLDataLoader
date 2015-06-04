@@ -103,7 +103,7 @@ class Schema:
 				if table.table_load_ordinal_group == ordinal_group and table.rows_to_generate > 0:
 					table.validate_unique_not_null_referential_rows_to_create()
 					table.get_column_referential_values()
-					table.insert_data(seconds_between_inserts)
+					table.generate_data(seconds_between_inserts)
 					
 	def get_table_index_from_name(self, table_name):
 		table_index = None

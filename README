@@ -1,0 +1,107 @@
+DataLoader 0.6 (beta)
+Author: Peter Sylvester
+
+DESCRIPTION
+	DataLoader is a schema interpreting random data loader for MySQL.
+	It can be used to connect to a single schema in MySQL via socket
+	or net connection.  It will determine what data can be generated
+	taking unique constraints, primary keys, and referential integrity
+	into consideration.
+	
+	There are several properties that can be configured at the column,
+	table, schema, and server level.  However please note that if you
+	adjust any properties at the command line via arguments, that
+	setting will take effect for all columns/tables unless otherwise
+	specified for individual columns/tables using the menu.
+	
+REQUIREMENTS
+	Python 2.6
+	python-argparse	- https://docs.python.org/3.4/library/argparse.html
+	MySQL-python	- https://pypi.python.org/pypi/MySQL-python/1.2.5
+	
+LIMITATIONS
+	Does not support spatial data columns.
+	
+	Does not support circular schema structures (IE: TableA references
+	TableB, which references TableC, which references TableA, etc).
+	
+	Is known to be thrown off by schema designs not intended by MySQL
+	itself, such as innodb tables having an FK reference to a MYISAM
+	table or an auto increment default on a non primary key column.
+	
+OPTIONS
+	--cardinality
+		Property: Column
+		The number of unique values to be generated per column.
+	
+	--database, -d
+		Property: Server
+		The MySQL schema that you would like to load data into.
+		
+	-h (help)
+		Displays the help page.
+		
+	--host
+		The MySQL server address that you would like to connect to.
+	
+	--menu
+		Toggles the menu, which allows you to apply settings to
+		individual tables and columns.
+		
+	--no_analyze_table
+		Property: Schema
+		By default all tables are analysed after data insertion to
+		refresh index cardinality and assure accurate optimization
+		engine activity.  Use this if you would prefer not to have 
+		the	tables analysed.
+		
+	--no_bin_log
+		Property: Server
+		Use this to disable binary logging of the random data creation.
+		Will not interfere with any other transactions being written
+		to the binary log.
+		
+	--null_percentage_chance
+		Default: 5
+		Property: Column
+		The percentage likelihood of a null being generated if the
+		column is nullable.
+		
+	--password, -p
+		The MySQL user password.
+		
+	--port, -P
+		Default: 3306
+		The port for the MySQL instance that you would like to connect to.
+		
+	--referential_sample_size
+		Default: 5000
+		Property: Column
+		If the column is not unique and cardinality is not explicitly
+		specified, this is the number of referential values that will be
+		read from the database and stored in order to generate date for
+		referential columns.
+	
+	--rows_per_insert
+		Default: 50
+		Property: Table
+		The number of rows to be created per insert.
+		
+	--rows_to_create_per_table, -r
+		Default: 10000
+		Property: Table
+		The number of rows to be created per table.
+	
+	--safety_off
+		You will not be able to write data into a schema that already has
+		data in it without using this option.
+	
+	--seconds_between_inserts
+		Default: 0
+		The number of seconds between each insert.
+	
+	--socket, -S
+		The MySQL socket.
+
+	--user, -u
+		The MySQL user.
